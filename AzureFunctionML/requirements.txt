@@ -3,5 +3,8 @@
 # Manually managing azure-functions-worker may cause unexpected issues
 
 azure-functions
-requests
+azure-eventhub
+azure-eventhub-checkpointstoreblob-aio
+
+
 
