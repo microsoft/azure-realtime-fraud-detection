@@ -3,9 +3,8 @@ import logging
 import azure.functions as func
 from azure.eventhub.aio import EventHubProducerClient
 from azure.eventhub import EventData
+import datetime
 import os
-
-
 
 async def main(req: func.HttpRequest) -> func.HttpResponse:
     topic_raw_payload = os.getenv("EventHubTopic")
@@ -41,4 +40,18 @@ async def produceMessage(event,topic,namespaceConnectionString):
     # comment this but we need to test de retry even have a failure to send a message.
     #loop = asyncio.get_event_loop()
     #loop.run_until_complete(produceMessage(payload,topic_raw_payload,eventhub_namespace))
+
+
+
+'''
+def main(req: func.HttpRequest):
+    timestamp = datetime.datetime.utcnow()
+    logging.info('Message created at: %s', timestamp)
+    req_body = req.get_json()
+
+    return str(req_body)
+
+'''
+
+
 
