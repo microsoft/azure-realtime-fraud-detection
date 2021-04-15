@@ -12,6 +12,13 @@
       ]
     },
     {
+      "type": "eventHub",
+      "name": "msg",
+      "eventHubName": "eventalfeu",
+      "connection": "MyEventHubSendAppSetting",
+      "direction": "out"
+  },
+    {
       "type": "http",
       "direction": "out",
       "name": "$return"
