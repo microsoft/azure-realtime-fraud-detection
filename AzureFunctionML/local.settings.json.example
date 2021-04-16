@@ -1,0 +1,14 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+            "AzureWebJobsStorage": "",  
+            "FUNCTIONS_WORKER_RUNTIME": "python",  
+            "AKSEndpoint": "<YOUR-AKS-ENDPOINT>",  
+            "AKSKey": "<YOUR-AKS-KEY>",  
+            "EventHubTopic": "<YOUR-EH-TOPIC>"  
+  },
+  
+  "ConnectionStrings": {
+  "MyEventHubSendAppSetting": "<YOUR-AKS-EH-CONNECTION-STRING>"
+  }
+}

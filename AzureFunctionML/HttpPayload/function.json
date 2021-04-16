@@ -14,7 +14,7 @@
     {
       "type": "eventHub",
       "name": "msg",
-      "eventHubName": "eventalfeu",
+      "eventHubName": "ehtesserato",
       "connection": "MyEventHubSendAppSetting",
       "direction": "out"
   },

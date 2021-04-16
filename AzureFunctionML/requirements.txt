@@ -5,6 +5,3 @@
 azure-functions
 azure-eventhub
 azure-eventhub-checkpointstoreblob-aio
-
-
-
