@@ -5,5 +5,5 @@
     "azureFunctions.projectLanguage": "Python",
     "azureFunctions.projectRuntime": "~3",
     "debug.internalConsoleOptions": "neverOpen",
-    "python.pythonPath": "/home/lfbraz/Workspace/azure-realtime-fraud-detection/.venv/bin/python"
+    "python.pythonPath": "AzureFunctionML/.venv/bin/python3"
 }
