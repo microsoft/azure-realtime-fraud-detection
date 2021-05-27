@@ -209,7 +209,7 @@ def execute_drop_operations(client):
 try:
     client = client.Client('wss://gremlin-tesserato-fraud.gremlin.cosmos.azure.com:443/', 'g',
                            username="/dbs/frauddetectiondb/colls/fraudring",
-                           password="ns7CHOov4ArW1KdImWGuFXvpnMcrs7wwQmTbMa3OVAWQyTsR955IWNI1Y1gFZ33NiEHsQkRxrtKVzuVHz7d2Uw==",
+                           password="",
                            message_serializer=serializer.GraphSONSerializersV2d0()
                            )
 
