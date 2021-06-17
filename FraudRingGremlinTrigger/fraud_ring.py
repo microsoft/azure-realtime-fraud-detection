@@ -1,5 +1,6 @@
 from gremlin_python.driver import client, serializer, protocol
 from gremlin_python.driver.protocol import GremlinServerError
+from azure.cosmos import exceptions, CosmosClient, PartitionKey
 import traceback
 import os
 
@@ -18,7 +19,11 @@ class FraudRing():
     
     def insert_vertice(self, id):
         
-        node_property = self._add_property_id_(id)
+        node_property = self._add_property_(id)
+        #Add Property Customer
+        # .property('id','22')
+        #Adicionar no metodo add property as novas propriedades de usuario que pego do cosmos.
+
         add_vertice = self._mount_add_vertice_('person', node_property)
         try:
             self._execute_gremlin_command_(add_vertice)
@@ -27,22 +32,21 @@ class FraudRing():
             # When the vertex already exists we must update it
             if e.status_attributes["x-ms-status-code"] == 409:
                 print('Conflict error!')
-                # update_vertice = self._mount_update_vertice_(id, node_property)
-                # self._execute_gremlin_command_(update_vertice)
+                update_vertice = self._mount_update_vertice_(id, node_property)
+                self._execute_gremlin_command_(update_vertice)
                 print('Updated Vertice successful')
     
-    def insert_edge(self, payload):
-        add_edge = self._mount_add_edge_(payload['customeridOrig'],
-                                         payload['customeridDest'],
-                                         'TRANSFER_TO',
-                                         payload['prediction']
-        )
-
+    def insert_edge(self, customeridOrig, customeridDest, type, prediction):
+        add_edge = self._mount_edge_(customeridOrig,
+                                         customeridDest,
+                                         type,
+                                         prediction)
+        
         try:
             self._execute_gremlin_command_(add_edge)
             print('Added Edge successful')
         except GremlinServerError as e:
-            print("Something went wrong with this query: {0}".format(payload))
+            print("Something went wrong with this query: {0}".format(add_edge))
 
     def _execute_gremlin_command_(self, command):
         callback = self.client.submitAsync(command)
@@ -53,15 +57,24 @@ class FraudRing():
             print("Something went wrong with this query: {0}".format(command))
         print("\n")
     
-    def _add_property_id_(self, id):
-        return f".property('id', '{id}')"
+    def _add_property_(self, id):
+        properties = f".property('id', '{id}')"
+        customer_data = self._get_customer_data_(id)
+        
+        properties += f".property('first_name', '{customer_data['FirstName']}')"
+        properties += f".property('last_name', '{customer_data['LastName']}')"
+        
+        return properties
     
     def _mount_add_vertice_(self, entity, node_properties):
         add_vertice = f"g.addV('{entity}'){node_properties}.property('pk', 'pk')"
         return add_vertice
 
-    def _mount_edge_(self, customer_origin, customer_dest, type, is_fraud):
-         add_edge = f"g.V('{customer_origin}').addE('{type}').to(g.V('{customer_dest}')).property('status', {is_fraud})"
+
+
+    def _mount_edge_(self, customeridOrig, customeridDest, type, prediction):
+         add_edge = f"g.V('{customeridOrig}').addE('{type}').to(g.V('{customeridDest}')).property('status', '{str(prediction)}')"
+         print(add_edge)
          return add_edge
 
     def _mount_update_vertice_(self, vertice_id, node_properties):
@@ -69,7 +82,39 @@ class FraudRing():
         update_vertice = f"g.V('{vertice_id}'){node_properties}"
         return update_vertice
 
+    def _get_customer_data_(self,id):
+        # Initialize the Cosmos client
+        ##### Adicionar dentro do arquivo de config
+        os.getenv("DB_GREMLIN")
 
+        endpoint = os.getenv("cosmosdbfraud_customer_DOCUMENTDB")
+        key = os.getenv("cosmosdbfraud_customer_DOCUMENTDB_Key")
+        
+        client = CosmosClient(endpoint, key)
+
+        ##### Adicionar dentro do arquivo de config
+        database_name = os.getenv("DATABASE_CUSTOMER")
+        database = client.create_database_if_not_exists(id=database_name)
+        container_name = os.getenv("CONTAINER_CUSTOMER")
+
+        container = database.create_container_if_not_exists(
+        id=container_name, 
+        partition_key=PartitionKey(path="/CustomerId"),
+        offer_throughput=400)
+
+        query = "SELECT * FROM c WHERE c.CustomerId = '" + str(id) + "'" 
+
+        items = list(container.query_items(
+            query=query,
+            enable_cross_partition_query=True
+        ))
+
+        return items[0]
+
+
+
+    
+    
 if __name__ == "__main__":
     fr = FraudRing()
     client = fr.connect_gremlin(client)

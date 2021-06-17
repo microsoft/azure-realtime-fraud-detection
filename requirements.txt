@@ -4,3 +4,4 @@
 
 azure-functions
 gremlinpython==3.4.8
+azure.cosmos
