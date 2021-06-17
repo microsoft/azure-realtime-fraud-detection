@@ -6,20 +6,25 @@ import traceback
 _gremlin_cleanup_graph = "g.V().drop()"
 
 _gremlin_insert_vertices = [
-    "g.addV('person').property('id', 'thomas').property('firstName', 'Thomas').property('age', 44).property('pk', 'pk')",
+    #"g.addV('person').property('id', 'thomas').property('firstName', 'Thomas').property('age', 44).property('pk', 'pk')",
+    "g.addV('person').property('id', 'thomas').property('firstName', 'Thomas').property('lastName', 'Marc').property('age', 44).property('pk', 'pk')",
     "g.addV('person').property('id', 'mary').property('firstName', 'Mary').property('lastName', 'Andersen').property('age', 39).property('pk', 'pk')",
     "g.addV('person').property('id', 'ben').property('firstName', 'Ben').property('lastName', 'Miller').property('pk', 'pk')",
     "g.addV('person').property('id', 'robin').property('firstName', 'Robin').property('lastName', 'Wakefield').property('pk', 'pk')",
     "g.addV('person').property('id', 'Paul').property('name', 'Paul').property('gender', 'man').property('age', 50).property('pk', 'pk')",
-    "g.addV('merchant').property('id', 'Just_Brew_It').property('name', 'Just_Brew_It').property('street', '826 Anmoore Road').property('address', 'San Bernardino CA 92410').property('pk', 'pk')"
+    "g.addV('person').property('id', 'luiz').property('name', 'Luiz').property('gender', 'man').property('age', 50).property('pk', 'pk')"
+    #"g.addV('merchant').property('id', 'Just_Brew_It').property('name', 'Just_Brew_It').property('street', '826 Anmoore Road').property('address', 'San Bernardino CA 92410').property('pk', 'pk')"
 ]
 
 _gremlin_insert_edges = [
     "g.V('thomas').addE('knows').to(g.V('mary'))",
     "g.V('thomas').addE('knows').to(g.V('ben'))",
+    "g.V('thomas').addE('knows').to(g.V('robin'))",
     "g.V('ben').addE('knows').to(g.V('robin'))",
-    "g.V('Paul').addE('HAS_BOUGHT_AT').to(g.V('Just_Brew_It')).property('Fraud', 1)",
-    
+    "g.V('robin').addE('knows').to(g.V('mary'))",
+    "g.V('robin').addE('knows').to(g.V('ben'))",
+    #"g.V('Paul').addE('HAS_BOUGHT_AT').to(g.V('Just_Brew_It')).property('Fraud', 1)",
+    #"g.V('Just_Brew_It').addE('HAS_BOUGHT_AT').to(g.V('ben')).property('Fraud', 0)"    
 ]
 
 
@@ -209,42 +214,42 @@ def execute_drop_operations(client):
 try:
     client = client.Client('wss://gremlin-tesserato-fraud.gremlin.cosmos.azure.com:443/', 'g',
                            username="/dbs/frauddetectiondb/colls/fraudring",
-                           password="",
+                           password="ZSKoarXkYHthkZYWAMUtYrGf1Q9shWgcCyjLrVJu8HZ7WFOcXXlHFqeInJq35mHDFloyMBM3I8cU1WMZpwYvPw==",
                            message_serializer=serializer.GraphSONSerializersV2d0()
                            )
 
     print("Welcome to Azure Cosmos DB + Gremlin on Python!")
 
     # Drop the entire Graph
-    input("We're about to drop whatever graph is on the server. Press any key to continue...")
+    #input("We're about to drop whatever graph is on the server. Press any key to continue...")
     cleanup_graph(client)
 
     # Insert all vertices
-    input("Let's insert some vertices into the graph. Press any key to continue...")
+    #input("Let's insert some vertices into the graph. Press any key to continue...")
     insert_vertices(client)
 
     # Create edges between vertices
-    input("Now, let's add some edges between the vertices. Press any key to continue...")
+    #input("Now, let's add some edges between the vertices. Press any key to continue...")
     insert_edges(client)
 
     # Update a couple of vertices
-    input("Ah, sorry. I made a mistake. Let's change the ages of these two vertices. Press any key to continue...")
+    #input("Ah, sorry. I made a mistake. Let's change the ages of these two vertices. Press any key to continue...")
     update_vertices(client)
 
     # Count all vertices
-    input("Okay. Let's count how many vertices we have. Press any key to continue...")
+    #input("Okay. Let's count how many vertices we have. Press any key to continue...")
     count_vertices(client)
 
     # Execute traversals and get results
-    input("Cool! Let's run some traversals on our graph. Press any key to continue...")
+    #input("Cool! Let's run some traversals on our graph. Press any key to continue...")
     execute_traversals(client)
 
     # Drop a few vertices and edges
-    input("So, life happens and now we will make some changes to the graph. Press any key to continue...")
-    execute_drop_operations(client)
+    #input("So, life happens and now we will make some changes to the graph. Press any key to continue...")
+    #execute_drop_operations(client)
 
     # Count all vertices again
-    input("How many vertices do we have left? Press any key to continue...")
+    #input("How many vertices do we have left? Press any key to continue...")
     count_vertices(client)
 
 except GremlinServerError as e:

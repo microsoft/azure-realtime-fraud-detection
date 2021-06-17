@@ -1,0 +1,15 @@
+{
+  "scriptFile": "__init__.py",
+  "bindings": [
+    {
+      "type": "cosmosDBTrigger",
+      "name": "documents",
+      "direction": "in",
+      "leaseCollectionName": "leases",
+      "connectionStringSetting": "cosmosdbtesseratofraud_DOCUMENTDB",
+      "databaseName": "Fraud",
+      "collectionName": "Fraud-Container",
+      "createLeaseCollectionIfNotExists": true
+    }
+  ]
+}
