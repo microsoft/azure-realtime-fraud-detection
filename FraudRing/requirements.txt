@@ -1,2 +1,0 @@
-gremlinpython==3.4.8
-futures
