@@ -74,9 +74,19 @@ class FraudRing():
 
 
     def _mount_edge_(self, customeridOrig, customeridDest, type, prediction):
-         add_edge = f"g.V('{customeridOrig}').addE('{type}').to(g.V('{customeridDest}')).property('status', '{str(prediction)}')"
-         print(add_edge)
-         return add_edge
+         
+        properties_Orig = self._add_property_(customeridOrig)
+        properties_Dest = self._add_property_(customeridDest)
+
+        properties_Orig = properties_Orig.replace('first_name','first_name_customer_orig').replace('last_name','last_name_customer_orig')
+        properties_Dest = properties_Dest.replace('first_name','first_name_customer_dest').replace('last_name','last_name_customer_dest')
+        
+        add_edge = f"g.V('{customeridOrig}').addE('{type}').to(g.V('{customeridDest}')).property('status', '{str(prediction)}')" 
+        add_edge += properties_Orig
+        add_edge += properties_Dest
+
+        print(add_edge)
+        return add_edge
 
     def _mount_update_vertice_(self, vertice_id, node_properties):
         node_properties = node_properties.replace(f".property('id', '{vertice_id}')", '')
