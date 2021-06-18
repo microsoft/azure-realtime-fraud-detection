@@ -2,6 +2,7 @@ from gremlin_python.driver import client, serializer, protocol
 from gremlin_python.driver.protocol import GremlinServerError
 from azure.cosmos import exceptions, CosmosClient, PartitionKey
 import traceback
+import enum
 import os
 
 class FraudRing():
@@ -111,9 +112,21 @@ class FraudRing():
 
         return items[0]
 
+    def edge_operation(self, type_id):
+        switcher={
+            1: "TRANSFER_TO",
+            2: "PAYMENT",
+            3: "DEPOSIT"
+        }
+        return switcher.get(type_id,"Invalid day of week")
 
 
-    
+
+    # class edge_operation(enum.Enum):
+    #     TRANSFER_TO = 1
+    #     PAYMENT = 2
+    #     DEPOSIT = 3
+        
     
 if __name__ == "__main__":
     fr = FraudRing()
