@@ -18,14 +18,11 @@ class FraudRing():
                            message_serializer=serializer.GraphSONSerializersV2d0()
                            )
     
-    def insert_vertice(self, id):
-        
-        node_property = self._add_property_(id)
-        #Add Property Customer
-        # .property('id','22')
-        #Adicionar no metodo add property as novas propriedades de usuario que pego do cosmos.
-
+    def insert_vertice(self, id):        
+        customer_data = self._get_customer_data_(id)
+        node_property = self._add_property_(id, customer_data)
         add_vertice = self._mount_add_vertice_('person', node_property)
+
         try:
             self._execute_gremlin_command_(add_vertice)
             print('Added Vertice successful')
@@ -36,12 +33,16 @@ class FraudRing():
                 update_vertice = self._mount_update_vertice_(id, node_property)
                 self._execute_gremlin_command_(update_vertice)
                 print('Updated Vertice successful')
+        return customer_data
     
-    def insert_edge(self, customeridOrig, customeridDest, type, prediction):
+    def insert_edge(self, customeridOrig, customeridDest, type, prediction, customer_data_Orig, customer_data_Dest):
         add_edge = self._mount_edge_(customeridOrig,
                                          customeridDest,
                                          type,
-                                         prediction)
+                                         prediction,
+                                         customer_data_Orig,
+                                         customer_data_Dest
+                                         )
         
         try:
             self._execute_gremlin_command_(add_edge)
@@ -58,34 +59,27 @@ class FraudRing():
             print("Something went wrong with this query: {0}".format(command))
         print("\n")
     
-    def _add_property_(self, id):
+    def _add_property_(self, id, customer_data):
         properties = f".property('id', '{id}')"
-        customer_data = self._get_customer_data_(id)
+        # customer_data = self._get_customer_data_(id)
         
         properties += f".property('first_name', '{customer_data['FirstName']}')"
         properties += f".property('last_name', '{customer_data['LastName']}')"
         
         return properties
     
+    
     def _mount_add_vertice_(self, entity, node_properties):
         add_vertice = f"g.addV('{entity}'){node_properties}.property('pk', 'pk')"
         return add_vertice
 
-
-
-    def _mount_edge_(self, customeridOrig, customeridDest, type, prediction):
-         
-        properties_Orig = self._add_property_(customeridOrig)
-        properties_Dest = self._add_property_(customeridDest)
-
-        properties_Orig = properties_Orig.replace('first_name','first_name_customer_orig').replace('last_name','last_name_customer_orig')
-        properties_Dest = properties_Dest.replace('first_name','first_name_customer_dest').replace('last_name','last_name_customer_dest')
+    def _mount_edge_(self, customeridOrig, customeridDest, type, prediction, customer_data_Orig, customer_data_Dest):         
+        properties_Orig = f".property('name_customeridOrig', '{customer_data_Orig['FirstName'] + ' ' + customer_data_Orig['LastName']}')"
+        properties_Dest = f".property('name_customeridDest', '{customer_data_Dest['FirstName'] + ' ' + customer_data_Dest['LastName']}')"
         
-        add_edge = f"g.V('{customeridOrig}').addE('{type}').to(g.V('{customeridDest}')).property('status', '{str(prediction)}')" 
+        add_edge = f"g.V('{customeridOrig}').addE('{type}').to(g.V('{customeridDest}')).property('status', '{ 'Fraud' if prediction else 'OK'}')" 
         add_edge += properties_Orig
         add_edge += properties_Dest
-
-        print(add_edge)
         return add_edge
 
     def _mount_update_vertice_(self, vertice_id, node_properties):

@@ -13,14 +13,19 @@ def main(documents: func.DocumentList) -> str:
         fr = FraudRing()
         
         # Insert (or update) origin vertice
-        fr.insert_vertice(documents[0]['customeridOrig'])
+        customer_data_Orig = fr.insert_vertice(documents[0]['customeridOrig'])
+
         # Insert (or update) destination vertice
-        fr.insert_vertice(documents[0]['customeridDest'])
+        customer_data_Dest = fr.insert_vertice(documents[0]['customeridDest'])
+
         # Correlation new edge
         fr.insert_edge(documents[0]['customeridOrig'], 
-        documents[0]['customeridDest'], 
-        fr.edge_operation(documents[0]['type']), 
-        documents[0]['prediction'])
+                       documents[0]['customeridDest'], 
+                       fr.edge_operation(documents[0]['type']), 
+                       documents[0]['prediction'],
+                       customer_data_Orig,
+                       customer_data_Dest
+                       )
 
         logging.info('Document id: %s', documents[0]['id'])
         
