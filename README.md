@@ -69,6 +69,13 @@ Any use of third-party trademarks or logos are subject to those third-party's po
 
 * Todas já estão no repositório, apenas documentar certinho o momento em que vamos provisionar cada uma delas 
 
+## Azure Synapse Analytics
+
+* Script gerado para a criação da tabela TB_EVENTS_FRAUD_DETECTION
+
+## Databricks
+
+* Todos os scripts que estavam no account do Luiz foram exportados, depois verificar se precisamos de mais alguma cois 
 
 
 
