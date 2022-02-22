@@ -7,3 +7,5 @@ gremlinpython==3.4.8
 azure.cosmos
 azure-eventhub
 azure-eventhub-checkpointstoreblob-aio
+aiohttp
+asyncio
