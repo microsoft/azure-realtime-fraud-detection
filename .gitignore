@@ -130,3 +130,8 @@ local.settings.json
 .python_packages
 .DS_Store
 
+# Custom
+*.csv
+*.amltmp
+*.amlignore
+/AzureMachineLearning/Notebooks/.ipynb_aml_checkpoints/
