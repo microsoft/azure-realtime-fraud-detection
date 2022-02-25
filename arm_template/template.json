@@ -8,34 +8,34 @@
           "description": "Specifies the name of the Azure Machine Learning service workspace."
         }
       },
-      "location": {
-        "type": "string",
-        "defaultValue": "westus2",
-        "allowedValues": [
-          "australiaeast",
-          "brazilsouth",
-          "canadacentral",
-          "centralus",
-          "eastasia",
-          "eastus",
-          "eastus2",
-          "francecentral",
-          "japaneast",
-          "koreacentral",
-          "northcentralus",
-          "northeurope",
-          "southeastasia",
-          "southcentralus",
-          "uksouth",
-          "westcentralus",
-          "westus",
-          "westus2",
-          "westeurope"
-        ],
-        "metadata": {
-          "description": "Specifies the location for all resources."
-        }
-      },
+      // "location": {
+      //   "type": "string",
+      //   "defaultValue": "westus2",
+      //   "allowedValues": [
+      //     "australiaeast",
+      //     "brazilsouth",
+      //     "canadacentral",
+      //     "centralus",
+      //     "eastasia",
+      //     "eastus",
+      //     "eastus2",
+      //     "francecentral",
+      //     "japaneast",
+      //     "koreacentral",
+      //     "northcentralus",
+      //     "northeurope",
+      //     "southeastasia",
+      //     "southcentralus",
+      //     "uksouth",
+      //     "westcentralus",
+      //     "westus",
+      //     "westus2",
+      //     "westeurope"
+      //   ],
+      //   "metadata": {
+      //     "description": "Specifies the location for all resources."
+      //   }
+      // },
       "sku":{
         "type": "string",
         "defaultValue": "enterprise",
@@ -90,19 +90,14 @@
           "description": "The language worker runtime to load in the function app."
         }
       },
-      "linuxFxVersion": {
+      "location": {
         "type": "string",
         "metadata": {
           "description": "Required for Linux app to represent runtime stack in the format of 'runtime|runtimeVersion'. For example: 'python|3.9'"
         }
-      },
-      "packageUri": {
-        "type": "string",
-        "metadata": {
-          "description": "The zip content url."
-        }
       }
     },
+
     //Variables
 
     "variables": {
@@ -112,13 +107,14 @@
       "eventHubName": "[concat('eventHub',uniqueString(resourceGroup().id))]",
       "tenantId": "[subscription().tenantId]",
       "applicationInsightsName": "[concat('ai',uniqueString(resourceGroup().id))]",
-      "hostingPlanName":"[concat('hosting',uniqueString(resourceGroup().id))]"
+      "hostingPlanName":"[concat('hosting',uniqueString(resourceGroup().id))]",
+      "storageAccountid": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
     },
     "resources": [
       {
         "type": "Microsoft.Storage/storageAccounts",
         "apiVersion": "2019-04-01",
-        "name": "[concat('alfstorage',uniqueString(resourceGroup().id))]",
+        "name": "[concat('fraud',uniqueString(resourceGroup().id))]",
         "location": "[parameters('location')]",
         "sku": {
           "name": "[variables('storageAccountType')]"
@@ -158,7 +154,7 @@
         "type": "Microsoft.Insights/components",
         "apiVersion": "2018-05-01-preview",
         "name": "[variables('applicationInsightsName')]",
-        "location": "[if(or(equals(parameters('location'),'eastus2'),equals(parameters('location'),'westcentralus')),'southcentralus',parameters('location'))]",
+        "location": "[parameters('location')]",
         "kind": "web",
         "properties": {
           "Application_Type": "web"
@@ -168,7 +164,7 @@
             "type": "Microsoft.EventHub/namespaces",
             "apiVersion": "2021-11-01",
             "name": "[variables('eventHubName')]",
-            "location": "Brazil South",
+            "location": "[parameters('location')]",
             "sku": {
                 "name": "Standard",
                 "tier": "Standard",
@@ -187,7 +183,7 @@
             "type": "Microsoft.EventHub/namespaces/eventhubs",
             "apiVersion": "2021-11-01",
             "name": "[concat(variables('eventHubName'), '/ehfraud')]",
-            "location": "Brazil South",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.EventHub/namespaces',  variables('eventHubName'))]"
             ],
@@ -201,7 +197,7 @@
             "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
             "apiVersion": "2021-11-01",
             "name": "[concat(variables('eventHubName'), '/ehfraud/$Default')]",
-            "location": "Brazil South",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('eventHubName'), 'ehfraud')]",
                 "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubName'))]"
@@ -212,7 +208,7 @@
             "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
             "apiVersion": "2021-11-01",
             "name": "[concat(variables('eventHubName'), '/ehfraud/asa-consumer-group-fraud')]",
-            "location": "Brazil South",
+            "location": "[parameters('location')]",
             "dependsOn":[
                 "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('eventHubName'), 'ehfraud')]",
                 "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubName'))]"
@@ -221,84 +217,64 @@
         },
 
         //function deployment
+
         {
-        "type": "Microsoft.Storage/storageAccounts",
-        "apiVersion": "2021-02-01",
-        "name": "[variables('storageAccountName')]",
-        "location": "[parameters('location')]",
-        "sku": {
-          "name": "[parameters('storageAccountType')]"
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2019-08-01",
+            "name": "[concat('funcsite',uniqueString(resourceGroup().id))]",
+            "kind": "functionapp,linux",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "name": "[concat('funcsite',uniqueString(resourceGroup().id))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "python"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~2"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2019-06-01').keys[0].value)]"
+                        }
+                    ]
+                },
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "clientAffinityEnabled": false
+            }
         },
-        "kind": "Storage"
-      },
-      {
-        "type": "Microsoft.Web/serverfarms",
-        "apiVersion": "2021-02-01",
-        "name": "[variables('hostingPlanName')]",
-        "location": "[parameters('location')]",
-        "sku": {
-          "name": "Y1",
-          "tier": "Dynamic",
-          "size": "Y1",
-          "family": "Y"
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2019-08-01",
+            "name": "[variables('hostingPlanName')]",
+            "location": "[parameters('location')]",
+            "kind": "linux",
+            "properties": {
+                "reserved": true
+            },
+            "sku": {
+                "Tier": "Standard",
+                "Name": "S1"
+            }
         },
-        "properties": {
-          "computeMode": "Dynamic",
-          "reserved": true
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+            "apiVersion": "2019-06-01",
+            "location": "[parameters('location')]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            }
         }
-      },
-      // {
-      //   "type": "microsoft.insights/components",
-      //   "apiVersion": "2020-02-02",
-      //   "name": "[variables('applicationInsightsName')]",
-      //   "location": "[parameters('appInsightsLocation')]",
-      //   "tags": {
-      //     "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('applicationInsightsName')))]": "Resource"
-      //   },
-      //   "properties": {
-      //     "Application_Type": "web"
-      //   },
-      //   "kind":"web"
-      // },
-      {
-        "type": "Microsoft.Web/sites",
-        "apiVersion": "2021-02-01",
-        "name": "[parameters('functionAppName')]",
-        "location": "[parameters('location')]",
-        "kind": "functionapp,linux",
-        "dependsOn": [
-          "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
-          "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
-          "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]"
-        ],
-        "properties": {
-          "reserved": true,
-          "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
-          "siteConfig": {          
-            "linuxFxVersion": "[parameters('linuxFxVersion')]",
-            "appSettings": [
-              {
-                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                "value": "[reference(resourceId('Microsoft.Insights/components', parameters('functionAppName')), '2015-05-01').InstrumentationKey]"
-              },
-              {
-                "name": "AzureWebJobsStorage",
-                "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
-              },
-              {
-                "name": "FUNCTIONS_EXTENSION_VERSION",
-                "value": "~4"
-              },
-              {
-                "name": "FUNCTIONS_WORKER_RUNTIME",
-                "value": "[parameters('functionWorkerRuntime')]"
-              },
-              {
-                "name": "WEBSITE_RUN_FROM_PACKAGE",
-                "value": "[parameters('packageUri')]"
-              }]
-          }
-        }
-      }]
+  
+      ]
 
 }
