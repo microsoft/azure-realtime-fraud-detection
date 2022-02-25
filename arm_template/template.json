@@ -108,7 +108,8 @@
       "tenantId": "[subscription().tenantId]",
       "applicationInsightsName": "[concat('ai',uniqueString(resourceGroup().id))]",
       "hostingPlanName":"[concat('hosting',uniqueString(resourceGroup().id))]",
-      "storageAccountid": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+      "storageAccountid": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+      "cosmosName":"[concat('cosmos',uniqueString(resourceGroup().id))]"
     },
     "resources": [
       {
@@ -305,7 +306,7 @@
         {
             "type": "Microsoft.DocumentDB/databaseAccounts",
             "apiVersion": "2021-10-15",
-            "name": "[concat('cosmosfraud',uniqueString(resourceGroup().id))]",
+            "name": "[variables('cosmosName')]",
             "location": "Brazil South",
             "tags": {
                 "defaultExperience": "Core (SQL)",
@@ -337,7 +338,7 @@
                 },
                 "locations": [
                     {
-                        "locationName": "Brazil South",
+                        "locationName": "[parameters('location')]",
                         "provisioningState": "Succeeded",
                         "failoverPriority": 0,
                         "isZoneRedundant": false
@@ -356,9 +357,348 @@
                 },
                 "networkAclBypassResourceIds": []
             }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Fraud"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/00000000-0000-0000-0000-000000000001')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "roleName": "Cosmos DB Built-in Data Reader",
+                "type": "BuiltInRole",
+                "assignableScopes": [
+                    "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+                ],
+                "permissions": [
+                    {
+                        "dataActions": [
+                            "Microsoft.DocumentDB/databaseAccounts/readMetadata",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/executeQuery",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/readChangeFeed",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/read"
+                        ],
+                        "notDataActions": []
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/Benford-First-Digit')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Benford-First-Digit",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/id"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "uniqueKeyPolicy": {
+                        "uniqueKeys": []
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/Benford-Second-Digit')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Benford-Second-Digit",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/id"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "uniqueKeyPolicy": {
+                        "uniqueKeys": []
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/Categories')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Categories",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/CategoryId"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "uniqueKeyPolicy": {
+                        "uniqueKeys": []
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/Customers')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Customers",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/CustomerId"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "uniqueKeyPolicy": {
+                        "uniqueKeys": []
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+         {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/leases')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "leases",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/id"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/Orders')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Orders",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/OrderId"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "uniqueKeyPolicy": {
+                        "uniqueKeys": []
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/Transactions')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Transactions",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/id"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "uniqueKeyPolicy": {
+                        "uniqueKeys": []
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/throughputSettings",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "throughput": 400,
+                    "autoscaleSettings": {
+                        "maxThroughput": 4000
+                    }
+                }
+            }
         }
-
-  
+        
       ]
 
 }
