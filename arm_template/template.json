@@ -109,7 +109,7 @@
       "applicationInsightsName": "[concat('ai',uniqueString(resourceGroup().id))]",
       "hostingPlanName":"[concat('hosting',uniqueString(resourceGroup().id))]",
       "storageAccountid": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
-      "cosmosName":"[concat('cosmos',uniqueString(resourceGroup().id))]"
+      "cosmosName":"[concat('cosmos2',uniqueString(resourceGroup().id))]"
     },
     "resources": [
       {
