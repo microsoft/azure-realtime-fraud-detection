@@ -138,7 +138,7 @@
       {
         "type": "Microsoft.KeyVault/vaults",
         "apiVersion": "2018-02-14",
-        "name": "[concat('alfvault',uniqueString(resourceGroup().id))]",
+        "name": "[concat('fraudvault',uniqueString(resourceGroup().id))]",
         "location": "[parameters('location')]",
         "properties": {
           "tenantId": "[variables('tenantId')]",
@@ -273,7 +273,91 @@
             "sku": {
                 "name": "Standard_LRS"
             }
+        },
+
+        // Stream Analytics Job
+        {
+          "type": "Microsoft.StreamAnalytics/StreamingJobs",
+          "apiVersion": "2019-06-01",
+          "name": "[concat('fraudAsa',uniqueString(resourceGroup().id))]",
+          "location": "[parameters('location')]",
+          "properties": {
+            "sku": {
+              "name": "standard"
+            },
+            "outputErrorPolicy": "stop",
+            "eventsOutOfOrderPolicy": "adjust",
+            "eventsOutOfOrderMaxDelayInSeconds": 0,
+            "eventsLateArrivalMaxDelayInSeconds": 5,
+            "dataLocale": "en-US",
+            "transformation": {
+              "name": "Transformation",
+              "properties": {
+                "streamingUnits": 3,
+                "query": "SELECT\r\n    *\r\nINTO\r\n    [YourOutputAlias]\r\nFROM\r\n    [YourInputAlias]"
+              }
+            }
+          }
+        },
+
+        //CosmosDB + Containers deployment
+
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts",
+            "apiVersion": "2021-10-15",
+            "name": "[concat('cosmosfraud',uniqueString(resourceGroup().id))]",
+            "location": "Brazil South",
+            "tags": {
+                "defaultExperience": "Core (SQL)",
+                "hidden-cosmos-mmspecial": "",
+                "CosmosAccountType": "Non-Production"
+            },
+            "kind": "GlobalDocumentDB",
+            "identity": {
+                "type": "None"
+            },
+            "properties": {
+                "publicNetworkAccess": "Enabled",
+                "enableAutomaticFailover": false,
+                "enableMultipleWriteLocations": false,
+                "isVirtualNetworkFilterEnabled": false,
+                "virtualNetworkRules": [],
+                "disableKeyBasedMetadataWriteAccess": false,
+                "enableFreeTier": false,
+                "enableAnalyticalStorage": true,
+                "analyticalStorageConfiguration": {},
+                "databaseAccountOfferType": "Standard",
+                "defaultIdentity": "FirstPartyIdentity",
+                "networkAclBypass": "None",
+                "disableLocalAuth": false,
+                "consistencyPolicy": {
+                    "defaultConsistencyLevel": "Session",
+                    "maxIntervalInSeconds": 5,
+                    "maxStalenessPrefix": 100
+                },
+                "locations": [
+                    {
+                        "locationName": "Brazil South",
+                        "provisioningState": "Succeeded",
+                        "failoverPriority": 0,
+                        "isZoneRedundant": false
+                    }
+                ],
+                "cors": [],
+                "capabilities": [],
+                "ipRules": [],
+                "backupPolicy": {
+                    "type": "Periodic",
+                    "periodicModeProperties": {
+                        "backupIntervalInMinutes": 240,
+                        "backupRetentionIntervalInHours": 8,
+                        "backupStorageRedundancy": "Local"
+                    }
+                },
+                "networkAclBypassResourceIds": []
+            }
         }
+
   
       ]
 
