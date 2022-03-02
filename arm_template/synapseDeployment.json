@@ -1,0 +1,286 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vulnerabilityAssessments_Default_storageContainerPath": {
+            "type": "SecureString"
+        },
+        "workspaces_syn_tesserato_fraud_name": {
+            "defaultValue": "syn-tesserato-fraud",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Synapse/workspaces",
+            "apiVersion": "2021-06-01",
+            "name": "[parameters('workspaces_syn_tesserato_fraud_name')]",
+            "location": "brazilsouth",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "defaultDataLakeStorage": {
+                    "createManagedPrivateEndpoint": false,
+                    "accountUrl": "https://stsynfraud.dfs.core.windows.net",
+                    "filesystem": "synapse-data"
+                },
+                "encryption": {},
+                "connectivityEndpoints": {
+                    "web": "[concat('https://web.azuresynapse.net?workspace=%2fsubscriptions%2f65b23e71-7c0b-4293-8c03-ab912f9b0f58%2fresourceGroups%2fRG-TESSERATO%2fproviders%2fMicrosoft.Synapse%2fworkspaces%2f', parameters('workspaces_syn_tesserato_fraud_name'))]",
+                    "dev": "[concat('https://', parameters('workspaces_syn_tesserato_fraud_name'), '.dev.azuresynapse.net')]",
+                    "sqlOnDemand": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '-ondemand.sql.azuresynapse.net')]",
+                    "sql": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '.sql.azuresynapse.net')]"
+                },
+                "managedResourceGroupName": "RG-TESSERATO-SYNAPSE",
+                "sqlAdministratorLogin": "sqladminuser",
+                "privateEndpointConnections": [],
+                "publicNetworkAccess": "Enabled",
+                "cspWorkspaceAdminProperties": {
+                    "initialWorkspaceAdminObjectId": "ecf5867f-cdf9-4c41-a7f3-30a9cfe94782"
+                },
+                "trustedServiceBypassEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/auditingSettings",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_syn_tesserato_fraud_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/bigDataPools",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '/clusterspark01')]",
+            "location": "brazilsouth",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_syn_tesserato_fraud_name'))]"
+            ],
+            "properties": {
+                "sparkVersion": "2.4",
+                "nodeCount": 3,
+                "nodeSize": "Small",
+                "nodeSizeFamily": "MemoryOptimized",
+                "autoScale": {
+                    "enabled": true,
+                    "minNodeCount": 3,
+                    "maxNodeCount": 3
+                },
+                "autoPause": {
+                    "enabled": true,
+                    "delayInMinutes": 15
+                },
+                "isComputeIsolationEnabled": false,
+                "sessionLevelPackagesEnabled": false,
+                "cacheSize": 0,
+                "dynamicExecutorAllocation": {
+                    "enabled": true
+                },
+                "provisioningState": "Succeeded"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/extendedAuditingSettings",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_syn_tesserato_fraud_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/firewallRules",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '/allowAll')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_syn_tesserato_fraud_name'))]"
+            ],
+            "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "255.255.255.255"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/integrationruntimes",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '/AutoResolveIntegrationRuntime')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_syn_tesserato_fraud_name'))]"
+            ],
+            "properties": {
+                "type": "Managed",
+                "typeProperties": {
+                    "computeProperties": {
+                        "location": "AutoResolve"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/securityAlertPolicies",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_syn_tesserato_fraud_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    ""
+                ],
+                "emailAccountAdmins": false,
+                "retentionDays": 0
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/sqlPools",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '/sqlpoolfraud')]",
+            "location": "brazilsouth",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_syn_tesserato_fraud_name'))]"
+            ],
+            "sku": {
+                "name": "DW100c",
+                "capacity": 0
+            },
+            "properties": {
+                "maxSizeBytes": 263882790666240,
+                "collation": "SQL_Latin1_General_CP1_CI_AI",
+                "storageAccountType": "GRS",
+                "provisioningState": "Succeeded"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/vulnerabilityAssessments",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_syn_tesserato_fraud_name'))]"
+            ],
+            "properties": {
+                "recurringScans": {
+                    "isEnabled": false,
+                    "emailSubscriptionAdmins": true
+                },
+                "storageContainerPath": "[parameters('vulnerabilityAssessments_Default_storageContainerPath')]"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/sqlPools/auditingSettings",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '/sqlpoolfraud/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces/sqlPools', parameters('workspaces_syn_tesserato_fraud_name'), 'sqlpoolfraud')]",
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_syn_tesserato_fraud_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/sqlPools/extendedAuditingSettings",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '/sqlpoolfraud/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces/sqlPools', parameters('workspaces_syn_tesserato_fraud_name'), 'sqlpoolfraud')]",
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_syn_tesserato_fraud_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/sqlPools/geoBackupPolicies",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '/sqlpoolfraud/Default')]",
+            "location": "Brazil South",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces/sqlPools', parameters('workspaces_syn_tesserato_fraud_name'), 'sqlpoolfraud')]",
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_syn_tesserato_fraud_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/sqlPools/securityAlertPolicies",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '/sqlpoolfraud/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces/sqlPools', parameters('workspaces_syn_tesserato_fraud_name'), 'sqlpoolfraud')]",
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_syn_tesserato_fraud_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    ""
+                ],
+                "emailAccountAdmins": false,
+                "retentionDays": 0
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/sqlPools/transparentDataEncryption",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '/sqlpoolfraud/current')]",
+            "location": "Brazil South",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces/sqlPools', parameters('workspaces_syn_tesserato_fraud_name'), 'sqlpoolfraud')]",
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_syn_tesserato_fraud_name'))]"
+            ],
+            "properties": {
+                "status": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Synapse/workspaces/sqlPools/vulnerabilityAssessments",
+            "apiVersion": "2021-06-01",
+            "name": "[concat(parameters('workspaces_syn_tesserato_fraud_name'), '/sqlpoolfraud/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Synapse/workspaces/sqlPools', parameters('workspaces_syn_tesserato_fraud_name'), 'sqlpoolfraud')]",
+                "[resourceId('Microsoft.Synapse/workspaces', parameters('workspaces_syn_tesserato_fraud_name'))]"
+            ],
+            "properties": {
+                "recurringScans": {
+                    "isEnabled": false,
+                    "emailSubscriptionAdmins": true
+                }
+            }
+        }
+    ]
+}

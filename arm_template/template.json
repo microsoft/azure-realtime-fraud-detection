@@ -8,34 +8,34 @@
           "description": "Specifies the name of the Azure Machine Learning service workspace."
         }
       },
-      "location": {
-        "type": "string",
-        "defaultValue": "westus2",
-        "allowedValues": [
-          "australiaeast",
-          "brazilsouth",
-          "canadacentral",
-          "centralus",
-          "eastasia",
-          "eastus",
-          "eastus2",
-          "francecentral",
-          "japaneast",
-          "koreacentral",
-          "northcentralus",
-          "northeurope",
-          "southeastasia",
-          "southcentralus",
-          "uksouth",
-          "westcentralus",
-          "westus",
-          "westus2",
-          "westeurope"
-        ],
-        "metadata": {
-          "description": "Specifies the location for all resources."
-        }
-      },
+      // "location": {
+      //   "type": "string",
+      //   "defaultValue": "westus2",
+      //   "allowedValues": [
+      //     "australiaeast",
+      //     "brazilsouth",
+      //     "canadacentral",
+      //     "centralus",
+      //     "eastasia",
+      //     "eastus",
+      //     "eastus2",
+      //     "francecentral",
+      //     "japaneast",
+      //     "koreacentral",
+      //     "northcentralus",
+      //     "northeurope",
+      //     "southeastasia",
+      //     "southcentralus",
+      //     "uksouth",
+      //     "westcentralus",
+      //     "westus",
+      //     "westus2",
+      //     "westeurope"
+      //   ],
+      //   "metadata": {
+      //     "description": "Specifies the location for all resources."
+      //   }
+      // },
       "sku":{
         "type": "string",
         "defaultValue": "enterprise",
@@ -50,21 +50,73 @@
        "namespaces_ehtesserato_name": {
             "defaultValue": "ehtesserato",
             "type": "String"
+        },
+     "functionAppName": {
+        "type": "string",
+        "defaultValue": "[format('func-{0}', uniqueString(resourceGroup().id))]",
+        "metadata": {
+          "description": "The name of the Azure Function app."
         }
+      },
+      "storageAccountType": {
+        "type": "string",
+        "defaultValue": "Standard_LRS",
+        "allowedValues": [
+          "Standard_LRS",
+          "Standard_GRS",
+          "Standard_RAGRS"
+        ],
+        "metadata": {
+          "description": "Storage Account type"
+        }
+      },
+       "appInsightsLocation": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]",
+        "metadata": {
+          "description": "Location for Application Insights"
+        }
+      },
+      "functionWorkerRuntime": {
+        "type": "string",
+        "defaultValue": "node",
+        "allowedValues": [
+          "dotnet",
+          "node",
+          "python",
+          "java"
+        ],
+        "metadata": {
+          "description": "The language worker runtime to load in the function app."
+        }
+      },
+      "location": {
+        "type": "string",
+        "metadata": {
+          "description": "Required for Linux app to represent runtime stack in the format of 'runtime|runtimeVersion'. For example: 'python|3.9'"
+        }
+      }
     },
+
+    //Variables
+
     "variables": {
       "storageAccountName": "[concat('alfeu',uniqueString(resourceGroup().id))]",
       "storageAccountType": "Standard_LRS",
       "keyVaultName": "[concat('kvalf',uniqueString(resourceGroup().id))]",
       "eventHubName": "[concat('eventHub',uniqueString(resourceGroup().id))]",
       "tenantId": "[subscription().tenantId]",
-      "applicationInsightsName": "[concat('ai',uniqueString(resourceGroup().id))]"
+      "applicationInsightsName": "[concat('ai',uniqueString(resourceGroup().id))]",
+      "hostingPlanName":"[concat('hosting',uniqueString(resourceGroup().id))]",
+      "storageAccountid": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+      "cosmosName":"[concat('cosmos',uniqueString(resourceGroup().id))]",
+      "cosmosGremlinName":"[concat('cosmosgraph',uniqueString(resourceGroup().id))]"
     },
     "resources": [
       {
         "type": "Microsoft.Storage/storageAccounts",
         "apiVersion": "2019-04-01",
-        "name": "[concat('alfstorage',uniqueString(resourceGroup().id))]",
+        "name": "[concat('fraud',uniqueString(resourceGroup().id))]",
         "location": "[parameters('location')]",
         "sku": {
           "name": "[variables('storageAccountType')]"
@@ -88,7 +140,7 @@
       {
         "type": "Microsoft.KeyVault/vaults",
         "apiVersion": "2018-02-14",
-        "name": "[concat('alfvault',uniqueString(resourceGroup().id))]",
+        "name": "[concat('fraudvault',uniqueString(resourceGroup().id))]",
         "location": "[parameters('location')]",
         "properties": {
           "tenantId": "[variables('tenantId')]",
@@ -104,7 +156,7 @@
         "type": "Microsoft.Insights/components",
         "apiVersion": "2018-05-01-preview",
         "name": "[variables('applicationInsightsName')]",
-        "location": "[if(or(equals(parameters('location'),'eastus2'),equals(parameters('location'),'westcentralus')),'southcentralus',parameters('location'))]",
+        "location": "[parameters('location')]",
         "kind": "web",
         "properties": {
           "Application_Type": "web"
@@ -114,7 +166,7 @@
             "type": "Microsoft.EventHub/namespaces",
             "apiVersion": "2021-11-01",
             "name": "[variables('eventHubName')]",
-            "location": "Brazil South",
+            "location": "[parameters('location')]",
             "sku": {
                 "name": "Standard",
                 "tier": "Standard",
@@ -133,7 +185,7 @@
             "type": "Microsoft.EventHub/namespaces/eventhubs",
             "apiVersion": "2021-11-01",
             "name": "[concat(variables('eventHubName'), '/ehfraud')]",
-            "location": "Brazil South",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.EventHub/namespaces',  variables('eventHubName'))]"
             ],
@@ -147,7 +199,7 @@
             "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
             "apiVersion": "2021-11-01",
             "name": "[concat(variables('eventHubName'), '/ehfraud/$Default')]",
-            "location": "Brazil South",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('eventHubName'), 'ehfraud')]",
                 "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubName'))]"
@@ -158,13 +210,678 @@
             "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
             "apiVersion": "2021-11-01",
             "name": "[concat(variables('eventHubName'), '/ehfraud/asa-consumer-group-fraud')]",
-            "location": "Brazil South",
+            "location": "[parameters('location')]",
             "dependsOn":[
                 "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('eventHubName'), 'ehfraud')]",
                 "[resourceId('Microsoft.EventHub/namespaces', variables('eventHubName'))]"
             ],
             "properties": {}
+        },
+
+        //function deployment
+
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2019-08-01",
+            "name": "[concat('funcsite',uniqueString(resourceGroup().id))]",
+            "kind": "functionapp,linux",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "name": "[concat('funcsite',uniqueString(resourceGroup().id))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "python"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~2"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';AccountKey=', listKeys(variables('storageAccountid'),'2019-06-01').keys[0].value)]"
+                        }
+                    ]
+                },
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "clientAffinityEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2019-08-01",
+            "name": "[variables('hostingPlanName')]",
+            "location": "[parameters('location')]",
+            "kind": "linux",
+            "properties": {
+                "reserved": true
+            },
+            "sku": {
+                "Tier": "Standard",
+                "Name": "S1"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+            "apiVersion": "2019-06-01",
+            "location": "[parameters('location')]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+
+        // Stream Analytics Job
+        {
+          "type": "Microsoft.StreamAnalytics/StreamingJobs",
+          "apiVersion": "2019-06-01",
+          "name": "[concat('fraudAsa',uniqueString(resourceGroup().id))]",
+          "location": "[parameters('location')]",
+          "properties": {
+            "sku": {
+              "name": "standard"
+            },
+            "outputErrorPolicy": "stop",
+            "eventsOutOfOrderPolicy": "adjust",
+            "eventsOutOfOrderMaxDelayInSeconds": 0,
+            "eventsLateArrivalMaxDelayInSeconds": 5,
+            "dataLocale": "en-US",
+            "transformation": {
+              "name": "Transformation",
+              "properties": {
+                "streamingUnits": 3,
+                "query": "SELECT\r\n    *\r\nINTO\r\n    [YourOutputAlias]\r\nFROM\r\n    [YourInputAlias]"
+              }
+            }
+          }
+        },
+
+        //CosmosDB + Containers deployment
+
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts",
+            "apiVersion": "2021-10-15",
+            "name": "[variables('cosmosName')]",
+            "location": "[parameters('location')]",
+            "tags": {
+                "defaultExperience": "Core (SQL)",
+                "hidden-cosmos-mmspecial": "",
+                "CosmosAccountType": "Non-Production"
+            },
+            "kind": "GlobalDocumentDB",
+            "identity": {
+                "type": "None"
+            },
+            "properties": {
+                "publicNetworkAccess": "Enabled",
+                "enableAutomaticFailover": false,
+                "enableMultipleWriteLocations": false,
+                "isVirtualNetworkFilterEnabled": false,
+                "virtualNetworkRules": [],
+                "disableKeyBasedMetadataWriteAccess": false,
+                "enableFreeTier": false,
+                "enableAnalyticalStorage": true,
+                "analyticalStorageConfiguration": {},
+                "databaseAccountOfferType": "Standard",
+                "defaultIdentity": "FirstPartyIdentity",
+                "networkAclBypass": "None",
+                "disableLocalAuth": false,
+                "consistencyPolicy": {
+                    "defaultConsistencyLevel": "Session",
+                    "maxIntervalInSeconds": 5,
+                    "maxStalenessPrefix": 100
+                },
+                "locations": [
+                    {
+                        "locationName": "[parameters('location')]",
+                        "provisioningState": "Succeeded",
+                        "failoverPriority": 0,
+                        "isZoneRedundant": false
+                    }
+                ],
+                "cors": [],
+                "capabilities": [],
+                "ipRules": [],
+                "backupPolicy": {
+                    "type": "Periodic",
+                    "periodicModeProperties": {
+                        "backupIntervalInMinutes": 240,
+                        "backupRetentionIntervalInHours": 8,
+                        "backupStorageRedundancy": "Local"
+                    }
+                },
+                "networkAclBypassResourceIds": []
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Fraud"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/00000000-0000-0000-0000-000000000001')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "roleName": "Cosmos DB Built-in Data Reader",
+                "type": "BuiltInRole",
+                "assignableScopes": [
+                    "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+                ],
+                "permissions": [
+                    {
+                        "dataActions": [
+                            "Microsoft.DocumentDB/databaseAccounts/readMetadata",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/executeQuery",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/readChangeFeed",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/read"
+                        ],
+                        "notDataActions": []
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/Benford-First-Digit')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Benford-First-Digit",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/id"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "uniqueKeyPolicy": {
+                        "uniqueKeys": []
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/Benford-Second-Digit')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Benford-Second-Digit",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/id"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "uniqueKeyPolicy": {
+                        "uniqueKeys": []
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/Categories')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Categories",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/CategoryId"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "uniqueKeyPolicy": {
+                        "uniqueKeys": []
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/Customers')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Customers",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/CustomerId"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "uniqueKeyPolicy": {
+                        "uniqueKeys": []
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+         {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/leases')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "leases",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/id"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/Orders')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Orders",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/OrderId"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "uniqueKeyPolicy": {
+                        "uniqueKeys": []
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/Transactions')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Transactions",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/id"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "uniqueKeyPolicy": {
+                        "uniqueKeys": []
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/throughputSettings",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosName'), '/Fraud/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "throughput": 400,
+                    "autoscaleSettings": {
+                        "maxThroughput": 4000
+                    }
+                }
+            }
+        },
+
+        //CosmosDB Gremlin Deployment
+
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts",
+            "apiVersion": "2021-10-15",
+            "name": "[variables('cosmosGremlinName')]",
+            "location": "[parameters('location')]",
+            "tags": {
+                "defaultExperience": "Gremlin (graph)",
+                "hidden-cosmos-mmspecial": ""
+            },
+            "kind": "GlobalDocumentDB",
+            "identity": {
+                "type": "None"
+            },
+            "properties": {
+                "publicNetworkAccess": "Enabled",
+                "enableAutomaticFailover": false,
+                "enableMultipleWriteLocations": false,
+                "isVirtualNetworkFilterEnabled": false,
+                "virtualNetworkRules": [],
+                "disableKeyBasedMetadataWriteAccess": false,
+                "enableFreeTier": false,
+                "enableAnalyticalStorage": false,
+                "analyticalStorageConfiguration": {},
+                "databaseAccountOfferType": "Standard",
+                "defaultIdentity": "FirstPartyIdentity",
+                "networkAclBypass": "None",
+                "disableLocalAuth": false,
+                "consistencyPolicy": {
+                    "defaultConsistencyLevel": "Session",
+                    "maxIntervalInSeconds": 5,
+                    "maxStalenessPrefix": 100
+                },
+                "locations": [
+                    {
+                        "locationName": "[parameters('location')]",
+                        "provisioningState": "Succeeded",
+                        "failoverPriority": 0,
+                        "isZoneRedundant": false
+                    }
+                ],
+                "cors": [],
+                "capabilities": [
+                    {
+                        "name": "EnableGremlin"
+                    }
+                ],
+                "ipRules": [],
+                "backupPolicy": {
+                    "type": "Periodic",
+                    "periodicModeProperties": {
+                        "backupIntervalInMinutes": 240,
+                        "backupRetentionIntervalInHours": 8,
+                        "backupStorageRedundancy": "Local"
+                    }
+                },
+                "networkAclBypassResourceIds": []
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/gremlinDatabases",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosGremlinName'), '/frauddetectiondb')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosGremlinName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "frauddetectiondb"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosGremlinName'), '/00000000-0000-0000-0000-000000000001')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosGremlinName'))]"
+            ],
+            "properties": {
+                "roleName": "Cosmos DB Built-in Data Reader",
+                "type": "BuiltInRole",
+                "assignableScopes": [
+                    "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosGremlinName'))]"
+                ],
+                "permissions": [
+                    {
+                        "dataActions": [
+                            "Microsoft.DocumentDB/databaseAccounts/readMetadata",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/executeQuery",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/readChangeFeed",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/read"
+                        ],
+                        "notDataActions": []
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlRoleDefinitions",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosGremlinName'), '/00000000-0000-0000-0000-000000000002')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosGremlinName'))]"
+            ],
+            "properties": {
+                "roleName": "Cosmos DB Built-in Data Contributor",
+                "type": "BuiltInRole",
+                "assignableScopes": [
+                    "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosGremlinName'))]"
+                ],
+                "permissions": [
+                    {
+                        "dataActions": [
+                            "Microsoft.DocumentDB/databaseAccounts/readMetadata",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/*",
+                            "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/items/*"
+                        ],
+                        "notDataActions": []
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/gremlinDatabases/graphs",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosGremlinName'), '/frauddetectiondb/fraudring')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/gremlinDatabases', variables('cosmosGremlinName'), 'frauddetectiondb')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosGremlinName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "fraudring",
+                    "indexingPolicy": {
+                        "indexingMode": "consistent",
+                        "automatic": true,
+                        "includedPaths": [
+                            {
+                                "path": "/*"
+                            }
+                        ],
+                        "excludedPaths": [
+                            {
+                                "path": "/\"_etag\"/?"
+                            }
+                        ]
+                    },
+                    "partitionKey": {
+                        "paths": [
+                            "/pk"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "uniqueKeyPolicy": {
+                        "uniqueKeys": []
+                    },
+                    "conflictResolutionPolicy": {
+                        "mode": "LastWriterWins",
+                        "conflictResolutionPath": "/_ts"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/gremlinDatabases/throughputSettings",
+            "apiVersion": "2021-10-15",
+            "name": "[concat(variables('cosmosGremlinName'), '/frauddetectiondb/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/gremlinDatabases', variables('cosmosGremlinName'), 'frauddetectiondb')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosGremlinName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "throughput": 400
+                }
+            }
         }
+
+
         
       ]
+
 }
