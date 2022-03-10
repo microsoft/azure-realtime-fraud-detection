@@ -3,19 +3,21 @@ import json
 import os
 import ssl
 
-data = {"customeridOrig":1, 
-        "type":3,
-        "amount":100,
-        "oldbalanceOrg":100,
-        "newbalanceOrig": 0,
-        "customeridDest":2, 
-        "oldbalanceDest":0,
-        "newbalanceDest":100,
-        "hour":1,
-        "dayOfMonth":1,
-        "isMerchantDest":1,
-        "errorBalanceOrig":0,
-        "errorBalanceDest":3000}
+data = { 
+    "customeridOrig":77, 
+    "type":2,
+    "amount":200,
+    "oldbalanceOrg":200,
+    "newbalanceOrig": 0,
+    "customeridDest":76, 
+    "oldbalanceDest":0,
+    "newbalanceDest":100,
+    "hour":1,
+    "dayOfMonth":1,
+    "isMerchantDest":1,
+    "errorBalanceOrig":0,
+    "errorBalanceDest":3000
+}
 
 body = str.encode(json.dumps(data))
 

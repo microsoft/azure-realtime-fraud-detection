@@ -1,0 +1,11 @@
+prediction_columns = ["type",
+                     "amount",
+                     "oldbalanceOrg",
+                     "newbalanceOrig",
+                     "oldbalanceDest",
+                     "newbalanceDest",
+                     "hour",
+                     "dayOfMonth",
+                     "isMerchantDest",
+                     "errorBalanceOrig",
+                     "errorBalanceDest"]

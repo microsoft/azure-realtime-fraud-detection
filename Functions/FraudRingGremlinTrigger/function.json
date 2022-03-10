@@ -7,7 +7,7 @@
       "direction": "in",
       "leaseCollectionName": "leases",
       "connectionStringSetting": "cosmosdbtesseratofraud_DOCUMENTDB",
-      "databaseName": "Fraud",
+      "databaseName": "fraud-detection-sql",
       "collectionName": "Transactions",
       "createLeaseCollectionIfNotExists": true,
       "leaseCollectionPrefix": "graph"

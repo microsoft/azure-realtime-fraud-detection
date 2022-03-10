@@ -123,13 +123,6 @@ class FraudRing():
             3: "DEPOSIT"
         }
         return switcher.get(type_id,"Invalid day of week")
-
-
-
-    # class edge_operation(enum.Enum):
-    #     TRANSFER_TO = 1
-    #     PAYMENT = 2
-    #     DEPOSIT = 3
         
     
 if __name__ == "__main__":
