@@ -1,4 +1,4 @@
-# Real-Time Fraud Detection -  Solution Accelerator Banner
+# Real-Time Fraud Detection -  Solution Accelerator
 
 <!-- 
 Guidelines on README format: https://review.docs.microsoft.com/help/onboard/admin/samples/concepts/readme-template?branch=master
@@ -24,7 +24,7 @@ Please check the prerequisites and step-by-step instructions for configuring the
 
 ## Prerequisites
 
-To use this solution accelerator, you need access to an [Azure srubscription](https://azure.microsoft.com/free/). Below we will show the steps to deploy and configure the services.
+To use this solution accelerator, you need access to an [Azure subscription](https://azure.microsoft.com/free/). Below we will show the steps to deploy and configure the services.
 
 While it's not required, a basic understanding of some services used will be helpful for understanding the solution. The following resources can help introduce you to them:
 
@@ -46,9 +46,8 @@ Start by deploying the resources toAzure. The button below will deploy All the s
 </a>
 
 ### 2. Configure Azure ML Environment
-[Configure AML]()
 
-Next you'll need to configure your [development environment](https://docs.microsoft.com/azure/machine-learning/how-to-configure-environment) for Azure Machine Learning. We recommend using a [Notebook VM](https://docs.microsoft.com/azure/machine-learning/how-to-configure-environment#compute-instance) as it's the fastest way to get up and running. Follow the steps in [EnvironmentSetup.md](./EnvironmentSetup.md) to create a Notebook VM and clone the repo onto it.
+Next you'll need to configure your [development environment](https://docs.microsoft.com/azure/machine-learning/how-to-configure-environment) for Azure Machine Learning. We recommend using an[Azure ML Workspace](https://docs.microsoft.com/en-us/azure/machine-learning/quickstart-create-resources) as it's the fastest way to get up and running. Follow the steps in [Azure ML](./AzureMachineLearning/README.md) to clone the repo onto it.
 
 ### 3. Configure Stream Analytics
 [Configure ASA]()
