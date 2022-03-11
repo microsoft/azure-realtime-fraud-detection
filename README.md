@@ -49,7 +49,7 @@ Start by deploying the resources toAzure. The button below will deploy All the s
 
 Next you'll need to configure your [development environment](https://docs.microsoft.com/azure/machine-learning/how-to-configure-environment) for Azure Machine Learning. We recommend using an [Azure ML Workspace](https://docs.microsoft.com/en-us/azure/machine-learning/quickstart-create-resources) as it's the fastest way to get up and running. 
 
-* > Now you use the AML environment. Please [see this Section to Train and Deploy the model](./AzureMachineLearning/README.md).
+* > Now you can use the AML environment. Please [see this Section to Train and Deploy the model](./AzureMachineLearning/README.md).
 
 ### 3. Configure Stream Analytics
 [Configure ASA]()
