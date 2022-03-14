@@ -110,7 +110,9 @@
       "hostingPlanName":"[concat('hosting',uniqueString(resourceGroup().id))]",
       "storageAccountid": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
       "cosmosName":"[concat('cosmos',uniqueString(resourceGroup().id))]",
-      "cosmosGremlinName":"[concat('cosmosgraph',uniqueString(resourceGroup().id))]"
+      "cosmosGremlinName":"[concat('cosmosgraph',uniqueString(resourceGroup().id))]",
+      "SynapseWorkspaceName":"[concat('sy',uniqueString(resourceGroup().id))]",
+      "SynapseManagedResourceGroupName":"[concat('syMan',uniqueString(resourceGroup().id))]"
     },
     "resources": [
       {
@@ -878,10 +880,42 @@
                     "throughput": 400
                 }
             }
+        },
+
+        //Synapse Deployment
+        {
+            "type": "Microsoft.Synapse/workspaces",
+            "apiVersion": "2021-06-01",
+            "name": "[variables('SynapseWorkspaceName')]",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "defaultDataLakeStorage": {
+                    "createManagedPrivateEndpoint": false,
+                    "accountUrl": "https://stsynfraud.dfs.core.windows.net",
+                    "filesystem": "synapse-data"
+                },
+                "encryption": {},
+                "connectivityEndpoints": {
+                    "web": "[concat('https://web.azuresynapse.net?workspace=%2fsubscriptions%2f65b23e71-7c0b-4293-8c03-ab912f9b0f58%2fresourceGroups%2fRG-TESSERATO%2fproviders%2fMicrosoft.Synapse%2fworkspaces%2f', variables('SynapseWorkspaceName'))]",
+                    "dev": "[concat('https://', variables('SynapseWorkspaceName'), '.dev.azuresynapse.net')]",
+                    "sqlOnDemand": "[concat(variables('SynapseWorkspaceName'), '-ondemand.sql.azuresynapse.net')]",
+                    "sql": "[concat(variables('SynapseWorkspaceName'), '.sql.azuresynapse.net')]"
+                },
+                "managedResourceGroupName": "[variables('SynapseManagedResourceGroupName')]",
+                "sqlAdministratorLogin": "sqladminuser",
+                "privateEndpointConnections": [],
+                "publicNetworkAccess": "Enabled",
+                "cspWorkspaceAdminProperties": {
+                    "initialWorkspaceAdminObjectId": "ecf5867f-cdf9-4c41-a7f3-30a9cfe94782"
+                },
+                "trustedServiceBypassEnabled": false
+            }
         }
 
-
-        
+    
       ]
 
 }
