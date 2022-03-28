@@ -39,7 +39,7 @@ While it's not required, a basic understanding of some services used will be hel
 
 ### 1. Deploy Resources
 
-Start by deploying the resources toAzure. The button below will deploy All the services and its related resources:
+Start by deploying the resources to Azure. The button below will deploy All the services and its related resources:
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fsolution-accelerator-many-models%2Fmaster%2Fazuredeploy.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
@@ -49,10 +49,14 @@ Start by deploying the resources toAzure. The button below will deploy All the s
 
 Next you'll need to configure your [development environment](https://docs.microsoft.com/azure/machine-learning/how-to-configure-environment) for Azure Machine Learning. We recommend using an [Azure ML Workspace](https://docs.microsoft.com/en-us/azure/machine-learning/quickstart-create-resources) as it's the fastest way to get up and running. 
 
-* > Now you can use the AML environment. Please [see this Section to Train and Deploy the model](./AzureMachineLearning/README.md).
+Now you can use the AML environment. Let's train and deploy the Machine Learning model.
+
+[Train and Deploy the model](./AzureMachineLearning/README.md)
 
 ### 3. Configure Stream Analytics
-[Configure ASA]()
+We will configure a Stream Analytics Job to consume the inputs from Event Hub and persist the outputs to an Azure Synapse SQL Pool and to a Cosmos DB SQL API. In this way we can use the outputs to feed some other processes.
+
+[Configure Stream Analytics Job](./StreamAnalytics/README.md)
 
 ### 4. Configure Cosmos DB
 [Configure Cosmos DB - SQL API]()
