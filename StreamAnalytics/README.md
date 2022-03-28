@@ -96,8 +96,17 @@ Click on +Add > Cosmos DB.
 
 Click on **Save** and check if the Connection to Cosmos DB output succeeded.
 
+### Add the Query
+With the inputs and outputs configured we can add the query. You can use this [Query](./query.sql) as template.
+
+Click on Query under *Job topology* menu and add the [Query Content](./query.sql)
+
+![Add Query](./Images/Add-Query.png)
+
+Click on **Save query**.
+
 ### Start your Stream Analytics job
 
-With the inputs and outputs configured we can now start the Stream Analytics Job. Go to the overview page and click on **Start**
+now start the Stream Analytics Job. Go to the overview page and click on **Start**
 
 ![Start ASA Job](./Images/Start-ASA-Job.png)

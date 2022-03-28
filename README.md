@@ -39,7 +39,7 @@ While it's not required, a basic understanding of some services used will be hel
 
 ### 1. Deploy Resources
 
-Start by deploying the resources toAzure. The button below will deploy All the services and its related resources:
+Start by deploying the resources to Azure. The button below will deploy All the services and its related resources:
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fsolution-accelerator-many-models%2Fmaster%2Fazuredeploy.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
