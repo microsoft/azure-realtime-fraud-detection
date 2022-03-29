@@ -60,6 +60,13 @@
           "description": "Storage Account type"
         }
       },
+      "allowAllConnections": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Choose whether you want to synchronise metadata."
+      }
+    },
        "appInsightsLocation": {
         "type": "string",
         "defaultValue": "[resourceGroup().location]",
@@ -93,7 +100,8 @@
     "variables": {
       "defaultDataLakeStorageFilesystemName":"[concat('alffs',uniqueString(resourceGroup().id))]",
       "defaultDataLakeStorageAccountUrl": "[concat('https://', parameters('storageAccountName'), '.dfs.core.windows.net')]",
-      "storageAccountName": "[concat('alfeu',uniqueString(resourceGroup().id))]",
+      "storageAccountName": "[concat('fraudstr',uniqueString(resourceGroup().id))]",
+      "dlsName": "[concat('sefsef',uniqueString(resourceGroup().id))]",
       "storageAccountType": "Standard_LRS",
       "keyVaultName": "[concat('kvalf',uniqueString(resourceGroup().id))]",
       "eventHubName": "[concat('eventHub',uniqueString(resourceGroup().id))]",
@@ -105,7 +113,8 @@
       "cosmosGremlinName":"[concat('cosmosgraph',uniqueString(resourceGroup().id))]",
       "SynapseWorkspaceName":"[concat('sy',uniqueString(resourceGroup().id))]",
       "SynapseManagedResourceGroupName":"[concat('syMan',uniqueString(resourceGroup().id))]",
-      "dataLakeStorageName": "[if(empty(parameters('storageAccountName')), replace(tolower(parameters('workspaceName')),'-',''), tolower(parameters('storageAccountName')))]"
+      "dataLakeStorageName": "[if(empty(parameters('storageAccountName')), replace(tolower(parameters('workspaceName')),'-',''), tolower(parameters('storageAccountName')))]",
+      "sqlPoolName":"[concat('syPool',uniqueString(resourceGroup().id))]"
     },
     "resources": [
       {
@@ -873,7 +882,7 @@
                     "throughput": 400
                 }
             }
-        },
+        }
 
         //Synapse Deployment
         // {
@@ -1148,108 +1157,165 @@
         // }
 
         //Synapse TEST Deployment
-        {
-            "apiVersion": "2019-06-01-preview",
-            "name": "[variables('SynapseWorkspaceName')]",
-            "location": "[parameters('location')]",
-            "type": "Microsoft.Synapse/workspaces",
-            "identity": {
-                "type": "SystemAssigned"
+
+    // ,{
+    //   "type": "Microsoft.Storage/storageAccounts",
+    //   "apiVersion": "2019-06-01",
+    //   "name": "[variables('dlsName')]",
+    //   "location": "[parameters('location')]",
+    //   "sku": {
+    //     "name": "Standard_LRS"
+    //   },
+    //   "kind": "StorageV2",
+    //   "properties": {
+    //     "accessTier": "Hot",
+    //     "supportsHttpsTrafficOnly": true,
+    //     "isHnsEnabled": true
+    //   },
+    //   "resources": [
+    //     {
+    //       "name": "[concat('default/', variables('dlsName'))]",
+    //       "type": "blobServices/containers",
+    //       "apiVersion": "2019-06-01",
+    //       "dependsOn": [
+    //         "[variables('dlsName')]"
+    //       ],
+    //       "properties": {
+    //         "publicAccess": "None"
+    //       }
+    //     }
+    //   ]
+    // },
+    ,{
+        "type": "Microsoft.Storage/storageAccounts",
+        "apiVersion": "2019-04-01",
+        "name": "[variables('dlsName')]",
+        "location": "[parameters('location')]",
+        "sku": {
+          "name": "[variables('storageAccountType')]"
+        },
+        "kind": "StorageV2",
+        "properties": {
+          "encryption": {
+            "services": {
+              "blob": {
+                "enabled": true
+              },
+              "file": {
+                "enabled": true
+              }
             },
-            "properties": {
-                "defaultDataLakeStorage": {
-                    "accountUrl": "[variables('defaultDataLakeStorageAccountUrl')]",
-                    "filesystem": "[variables('defaultDataLakeStorageFilesystemName')]"
-                },
-                "sqlAdministratorLogin": "[parameters('sqlAdministratorLogin')]",
-                "sqlAdministratorLoginPassword": "[parameters('sqlAdministratorPassword')]",
-                "adlaResourceId": "",
-                "managedVirtualNetwork": ""
-            },
-            "resources": [
-                {
-                    "condition": "true",
-                    "apiVersion": "2019-06-01-preview",
-                    "dependsOn": [
-                        "[concat('Microsoft.Synapse/workspaces/', variables('SynapseWorkspaceName'))]"
-                    ],
-                    "location": "[parameters('location')]",
-                    "name": "allowAll",
-                    "properties": {
-                        "startIpAddress": "0.0.0.0",
-                        "endIpAddress": "255.255.255.255"
-                    },
-                    "type": "firewallrules"
-                },
-                {
-                    "apiVersion": "2019-06-01-preview",
-                    "dependsOn": [
-                        "[concat('Microsoft.Synapse/workspaces/', variables('SynapseWorkspaceName'))]"
-                    ],
-                    "location": "[parameters('location')]",
-                    "name": "default",
-                    "properties": {
-                        "grantSqlControlToManagedIdentity": {
-                            "desiredState": "Enabled"
-                        }
-                    },
-                    "type": "managedIdentitySqlControlSettings"
+            "keySource": "Microsoft.Storage"
+          },
+          "supportsHttpsTrafficOnly": true
+        },
+        "resources": [
+            {
+                "name": "[concat('default/', variables('defaultDataLakeStorageFilesystemName'))]",
+                "type": "blobServices/containers",
+                "apiVersion": "2019-06-01",
+                "dependsOn": [
+                    "[variables('dlsName')]"
+                ],
+                "properties": {
+                    "publicAccess": "None"
                 }
-            ],
-            "dependsOn": [
-                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
-                "[concat('Microsoft.Resources/deployments/',variables('defaultDataLakeStorageFilesystemName'))]"
-            ],
-            "tags": "Fruad Detection Project Demo"
+
+            }
+        ]
+      },
+    {
+      "type": "Microsoft.Synapse/workspaces",
+      "apiVersion": "2019-06-01-preview",
+      "name": "[variables('SynapseWorkspaceName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "dependsOn": [
+        "[variables('dlsName')]",
+        "[variables('defaultDataLakeStorageFilesystemName')]"
+      ],
+      "properties": {
+        "defaultDataLakeStorage": {
+          "accountUrl": "[reference(variables('dlsName')).primaryEndpoints.dfs]",
+          "filesystem": "[variables('defaultDataLakeStorageFilesystemName')]"
+        },
+        "sqlAdministratorLogin": "[parameters('sqlAdministratorLogin')]",
+        "sqlAdministratorLoginPassword": "[parameters('sqlAdministratorPassword')]",
+        "managedVirtualNetwork": "default"
+      },
+      "resources": [
+        {
+          "condition": "[parameters('allowAllConnections')]",
+          "type": "firewallrules",
+          "apiVersion": "2019-06-01-preview",
+          "name": "allowAll",
+          "location": "[parameters('location')]",
+          "dependsOn": [ "[variables('SynapseWorkspaceName')]" ],
+          "properties": {
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "255.255.255.255"
+          }
         },
         {
-            "condition": "[parameters('setWorkspaceIdentityRbacOnStorageAccount')]",
-            "apiVersion": "2019-05-01",
-            "name": "storageRoleDeploymentResource",
-            "type": "Microsoft.Resources/deployments",
-            "subscriptionId": "[parameters('storageSubscriptionID')]",
-            "resourceGroup": "[parameters('storageResourceGroupName')]",
-            "dependsOn": [
-                "[concat('Microsoft.Synapse/workspaces/', parameters('name'))]"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "parameters": {},
-                    "variables": {},
-                    "resources": [
-                        {
-                            "type": "Microsoft.Storage/storageAccounts/providers/roleAssignments",
-                            "apiVersion": "2018-09-01-preview",
-                            "name": "[concat(parameters('defaultDataLakeStorageAccountName'), '/Microsoft.Authorization/',  guid(concat(resourceGroup().id, '/', variables('storageBlobDataContributorRoleID'), '/', parameters('name'), '/', parameters('storageRoleUniqueId'))))]",
-                            "location": "[parameters('storageLocation')]",
-                            "properties": {
-                                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables('storageBlobDataContributorRoleID'))]",
-                                "principalId": "[reference(concat('Microsoft.Synapse/workspaces/', parameters('name')), '2019-06-01-preview', 'Full').identity.principalId]",
-                                "principalType": "ServicePrincipal"
-                            }
-                        },
-                        {
-                            "condition": "[parameters('setSbdcRbacOnStorageAccount')]",
-                            "type": "Microsoft.Storage/storageAccounts/providers/roleAssignments",
-                            "apiVersion": "2018-09-01-preview",
-                            "name": "[concat(parameters('defaultDataLakeStorageAccountName'), '/Microsoft.Authorization/',  guid(concat(resourceGroup().id, '/', variables('storageBlobDataContributorRoleID'), '/', parameters('userObjectId'), '/', parameters('storageRoleUniqueId'))))]",
-                            "properties": {
-                                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables('storageBlobDataContributorRoleID'))]",
-                                "principalId": "[parameters('userObjectId')]",
-                                "principalType": "User"
-                            }
-                        }
-                    ]
-                }
+          "type": "firewallrules",
+          "apiVersion": "2019-06-01-preview",
+          "name": "AllowAllWindowsAzureIps",
+          "location": "[parameters('location')]",
+          "dependsOn": [ "[variables('SynapseWorkspaceName')]" ],
+          "properties": {
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "0.0.0.0"
+          }
+        },
+        {
+          "type": "managedIdentitySqlControlSettings",
+          "apiVersion": "2019-06-01-preview",
+          "name": "default",
+          "location": "[parameters('location')]",
+          "dependsOn": [ "[variables('SynapseWorkspaceName')]" ],
+          "properties": {
+            "grantSqlControlToManagedIdentity": {
+              "desiredState": "Enabled"
             }
+          }
         }
-
+      ]
+    },
+     {
+      "type": "Microsoft.Synapse/workspaces/sqlPools",
+      "apiVersion": "2019-06-01-preview",
+      "name": "[concat(variables('SynapseWorkspaceName'), '/', variables('sqlPoolName'))]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "DW100c"
+      },
+      "dependsOn": [
+        "[variables('SynapseWorkspaceName')]"
+      ],
+      "properties": {
+        "createMode": "Default",
+        "collation": "SQL_Latin1_General_CP1_CI_AS"
+      },
+      "resources": [
+        {
+          "condition": "[parameters('allowAllConnections')]",
+          "type": "metadataSync",
+          "apiVersion": "2019-06-01-preview",
+          "name": "config",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+            "[variables('sqlPoolName')]"
+          ],
+          "properties": {
+            "Enabled": "[parameters('allowAllConnections')]"
+          }
+        }
+      ]
+    }
 
         
-       
         
       ]
 
