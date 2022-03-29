@@ -11,6 +11,8 @@ You should have the following Services configured:
 
 All these services are deployed using the **Deploy to Azure** button ([see the main Section](./README.md)).
 
+pip install --pre azure-cosmos
+
 ## Quick Start
 
 ### SQL API

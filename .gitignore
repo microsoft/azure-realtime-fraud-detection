@@ -135,3 +135,4 @@ local.settings.json
 *.amltmp
 *.amlignore
 /AzureMachineLearning/Notebooks/.ipynb_aml_checkpoints/
+/AzureCosmosDB/Scripts/config.py
