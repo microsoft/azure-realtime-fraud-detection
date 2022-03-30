@@ -7,7 +7,6 @@ In this Section you will configure the Azure Cosmos DB service. We will use the 
 You should have the following Services configured:
 
 - Azure Cosmos DB - [SQL API](https://docs.microsoft.com/en-us/azure/cosmos-db/choose-api#coresql-api)
-- Azure Cosmos DB - [Gremlin API](https://docs.microsoft.com/en-us/azure/cosmos-db/choose-api#gremlin-api)
 
 All these services are deployed using the **Deploy to Azure** button ([see the main Section](./README.md)).
 
