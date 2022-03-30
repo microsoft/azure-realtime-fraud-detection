@@ -8,7 +8,7 @@ You should have the following Service configured:
 
 - Azure Cosmos DB - [SQL API](https://docs.microsoft.com/en-us/azure/cosmos-db/choose-api#coresql-api)
 
-All these services are deployed using the **Deploy to Azure** button ([see the main Section](./README.md)).
+The service is deployed using the **Deploy to Azure** button ([see the main Section](./README.md)).
 
 To run the scripts to feed the Containers with Sample Data you will need [Azure Cosmos DB Python SDK](https://docs.microsoft.com/en-us/azure/cosmos-db/sql/sql-api-sdk-python). If you want, you can create a Python's environment to install de package below:
 
