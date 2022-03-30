@@ -59,6 +59,8 @@ We will configure a Stream Analytics Job to consume the inputs from Event Hub an
 [Configure Stream Analytics Job](./StreamAnalytics/README.md)
 
 ### 4. Configure Cosmos DB
+We need to load some data to our Cosmos DB SQL API account. The link below provide a process to do that.
+
 [Configure Cosmos DB - SQL API](./AzureCosmosDB/README.md)
 
 ### 5. Deploy the Functions
