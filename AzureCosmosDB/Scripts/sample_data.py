@@ -1,7 +1,7 @@
 def get_benford_items(type):    
     items = []
 
-    if type == 'first-digit':
+    if type == 'second-digit':
         for id in range(10):
             item = {
                     "id": f"{id}",
