@@ -4,7 +4,7 @@ In this Section you will configure the Azure Cosmos DB service. We will use the 
 
 ## Prerequisites
 
-You should have the following Services configured:
+You should have the following Service configured:
 
 - Azure Cosmos DB - [SQL API](https://docs.microsoft.com/en-us/azure/cosmos-db/choose-api#coresql-api)
 
