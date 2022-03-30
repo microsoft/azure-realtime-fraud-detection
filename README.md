@@ -59,8 +59,7 @@ We will configure a Stream Analytics Job to consume the inputs from Event Hub an
 [Configure Stream Analytics Job](./StreamAnalytics/README.md)
 
 ### 4. Configure Cosmos DB
-[Configure Cosmos DB - SQL API]()
-[Configure Cosmos DB - Gremlin API]()
+[Configure Cosmos DB - SQL API](./AzureCosmosDB/README.md)
 
 ### 5. Deploy the Functions
 [How to Deploy the Functions]()
