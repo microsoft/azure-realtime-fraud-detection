@@ -2,6 +2,13 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+      
+      "deploymentPrefixName": {
+        "type": "string",
+        "metadata": {
+          "description": "Specifies the name of the Azure Machine Learning service workspace."
+        }
+      },
       "workspaceName": {
         "type": "string",
         "metadata": {
@@ -98,21 +105,21 @@
     //Variables
 
     "variables": {
-      "defaultDataLakeStorageFilesystemName":"[concat('alffs',uniqueString(resourceGroup().id))]",
+      "defaultDataLakeStorageFilesystemName":"[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
       "defaultDataLakeStorageAccountUrl": "[concat('https://', parameters('storageAccountName'), '.dfs.core.windows.net')]",
-      "storageAccountName": "[concat('fraudstr',uniqueString(resourceGroup().id))]",
-      "dlsName": "[concat('sefsef',uniqueString(resourceGroup().id))]",
+      "storageAccountName": "[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
+      "dlsName": "[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
       "storageAccountType": "Standard_LRS",
-      "keyVaultName": "[concat('kvalf',uniqueString(resourceGroup().id))]",
-      "eventHubName": "[concat('eventHub',uniqueString(resourceGroup().id))]",
+      "keyVaultName": "[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
+      "eventHubName": "[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
       "tenantId": "[subscription().tenantId]",
-      "applicationInsightsName": "[concat('ai',uniqueString(resourceGroup().id))]",
-      "hostingPlanName":"[concat('hosting',uniqueString(resourceGroup().id))]",
+      "applicationInsightsName": "[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
+      "hostingPlanName":"[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
       "storageAccountid": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
-      "cosmosName":"[concat('cosmos',uniqueString(resourceGroup().id))]",
-      "cosmosGremlinName":"[concat('cosmosgraph',uniqueString(resourceGroup().id))]",
+      "cosmosName":"[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
+      "cosmosGremlinName":"[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
       "SynapseWorkspaceName":"[concat('sy',uniqueString(resourceGroup().id))]",
-      "SynapseManagedResourceGroupName":"[concat('syMan',uniqueString(resourceGroup().id))]",
+      "SynapseManagedResourceGroupName":"[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
       "dataLakeStorageName": "[if(empty(parameters('storageAccountName')), replace(tolower(parameters('workspaceName')),'-',''), tolower(parameters('storageAccountName')))]",
       "sqlPoolName":"[concat('syPool',uniqueString(resourceGroup().id))]"
     },
@@ -884,308 +891,9 @@
             }
         }
 
-        //Synapse Deployment
-        // {
-        //     "type": "Microsoft.Synapse/workspaces",
-        //     "apiVersion": "2021-06-01",
-        //     "name": "[variables('SynapseWorkspaceName')]",
-        //     "location": "[parameters('location')]",
-        //     "identity": {
-        //         "type": "SystemAssigned"
-        //     },
-        //     "properties": {
-        //         "defaultDataLakeStorage": {
-        //             "createManagedPrivateEndpoint": false,
-        //             "accountUrl": "https://stsynfraud.dfs.core.windows.net",
-        //             "filesystem": "synapse-data"
-        //         },
-        //         "encryption": {},
-        //         "connectivityEndpoints": {
-        //             "web": "[concat('https://web.azuresynapse.net?workspace=%2fsubscriptions%2f65b23e71-7c0b-4293-8c03-ab912f9b0f58%2fresourceGroups%2fRG-TESSERATO%2fproviders%2fMicrosoft.Synapse%2fworkspaces%2f', variables('SynapseWorkspaceName'))]",
-        //             "dev": "[concat('https://', variables('SynapseWorkspaceName'), '.dev.azuresynapse.net')]",
-        //             "sqlOnDemand": "[concat(variables('SynapseWorkspaceName'), '-ondemand.sql.azuresynapse.net')]",
-        //             "sql": "[concat(variables('SynapseWorkspaceName'), '.sql.azuresynapse.net')]"
-        //         },
-        //         "managedResourceGroupName": "[variables('SynapseManagedResourceGroupName')]",
-        //         "sqlAdministratorLogin": "sqladminuser",
-        //         "privateEndpointConnections": [],
-        //         "publicNetworkAccess": "Enabled",
-        //         "cspWorkspaceAdminProperties": {
-        //             "initialWorkspaceAdminObjectId": "ecf5867f-cdf9-4c41-a7f3-30a9cfe94782"
-        //         },
-        //         "trustedServiceBypassEnabled": false
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Synapse/workspaces/auditingSettings",
-        //     "apiVersion": "2021-06-01",
-        //     "name": "[concat(variables('SynapseWorkspaceName'), '/Default')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Synapse/workspaces', variables('SynapseWorkspaceName'))]"
-        //     ],
-        //     "properties": {
-        //         "retentionDays": 0,
-        //         "auditActionsAndGroups": [],
-        //         "isStorageSecondaryKeyInUse": false,
-        //         "isAzureMonitorTargetEnabled": false,
-        //         "state": "Disabled",
-        //         "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Synapse/workspaces/bigDataPools",
-        //     "apiVersion": "2021-06-01",
-        //     "name": "[concat(variables('SynapseWorkspaceName'), '/clusterspark01')]",
-        //     "location": "brazilsouth",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Synapse/workspaces', variables('SynapseWorkspaceName'))]"
-        //     ],
-        //     "properties": {
-        //         "sparkVersion": "2.4",
-        //         "nodeCount": 3,
-        //         "nodeSize": "Small",
-        //         "nodeSizeFamily": "MemoryOptimized",
-        //         "autoScale": {
-        //             "enabled": true,
-        //             "minNodeCount": 3,
-        //             "maxNodeCount": 3
-        //         },
-        //         "autoPause": {
-        //             "enabled": true,
-        //             "delayInMinutes": 15
-        //         },
-        //         "isComputeIsolationEnabled": false,
-        //         "sessionLevelPackagesEnabled": false,
-        //         "cacheSize": 0,
-        //         "dynamicExecutorAllocation": {
-        //             "enabled": true
-        //         },
-        //         "provisioningState": "Succeeded"
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Synapse/workspaces/extendedAuditingSettings",
-        //     "apiVersion": "2021-06-01",
-        //     "name": "[concat(variables('SynapseWorkspaceName'), '/Default')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Synapse/workspaces', variables('SynapseWorkspaceName'))]"
-        //     ],
-        //     "properties": {
-        //         "retentionDays": 0,
-        //         "auditActionsAndGroups": [],
-        //         "isStorageSecondaryKeyInUse": false,
-        //         "isAzureMonitorTargetEnabled": false,
-        //         "state": "Disabled",
-        //         "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
-        //     }
-        // },
-        //   {
-        //     "type": "Microsoft.Synapse/workspaces/firewallRules",
-        //     "apiVersion": "2021-06-01",
-        //     "name": "[concat(variables('SynapseWorkspaceName'), '/allowAll')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Synapse/workspaces', variables('SynapseWorkspaceName'))]"
-        //     ],
-        //     "properties": {
-        //         "startIpAddress": "0.0.0.0",
-        //         "endIpAddress": "255.255.255.255"
-        //     }
-        // },
-        //  {
-        //     "type": "Microsoft.Synapse/workspaces/integrationruntimes",
-        //     "apiVersion": "2021-06-01",
-        //     "name": "[concat(variables('SynapseWorkspaceName'), '/AutoResolveIntegrationRuntime')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Synapse/workspaces', variables('SynapseWorkspaceName'))]"
-        //     ],
-        //     "properties": {
-        //         "type": "Managed",
-        //         "typeProperties": {
-        //             "computeProperties": {
-        //                 "location": "AutoResolve"
-        //             }
-        //         }
-        //     }
-        // },
-        //  {
-        //     "type": "Microsoft.Synapse/workspaces/securityAlertPolicies",
-        //     "apiVersion": "2021-06-01",
-        //     "name": "[concat(variables('SynapseWorkspaceName'), '/Default')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Synapse/workspaces', variables('SynapseWorkspaceName'))]"
-        //     ],
-        //     "properties": {
-        //         "state": "Disabled",
-        //         "disabledAlerts": [
-        //             ""
-        //         ],
-        //         "emailAddresses": [
-        //             ""
-        //         ],
-        //         "emailAccountAdmins": false,
-        //         "retentionDays": 0
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Synapse/workspaces/sqlPools",
-        //     "apiVersion": "2021-06-01",
-        //     "name": "[concat(variables('SynapseWorkspaceName'), '/sqlpoolfraud')]",
-        //     "location": "brazilsouth",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Synapse/workspaces', variables('SynapseWorkspaceName'))]"
-        //     ],
-        //     "sku": {
-        //         "name": "DW100c",
-        //         "capacity": 0
-        //     },
-        //     "properties": {
-        //         "maxSizeBytes": 263882790666240,
-        //         "collation": "SQL_Latin1_General_CP1_CI_AI",
-        //         "storageAccountType": "GRS",
-        //         "provisioningState": "Succeeded"
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Synapse/workspaces/vulnerabilityAssessments",
-        //     "apiVersion": "2021-06-01",
-        //     "name": "[concat(variables('SynapseWorkspaceName'), '/Default')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Synapse/workspaces', variables('SynapseWorkspaceName'))]"
-        //     ],
-        //     "properties": {
-        //         "recurringScans": {
-        //             "isEnabled": false,
-        //             "emailSubscriptionAdmins": true
-        //         }
-        //         // "storageContainerPath": "SecureString"
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Synapse/workspaces/sqlPools/auditingSettings",
-        //     "apiVersion": "2021-06-01",
-        //     "name": "[concat(variables('SynapseWorkspaceName'), '/sqlpoolfraud/Default')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Synapse/workspaces/sqlPools', variables('SynapseWorkspaceName'), 'sqlpoolfraud')]",
-        //         "[resourceId('Microsoft.Synapse/workspaces', variables('SynapseWorkspaceName'))]"
-        //     ],
-        //     "properties": {
-        //         "retentionDays": 0,
-        //         "auditActionsAndGroups": [],
-        //         "isStorageSecondaryKeyInUse": false,
-        //         "isAzureMonitorTargetEnabled": false,
-        //         "state": "Disabled",
-        //         "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Synapse/workspaces/sqlPools/extendedAuditingSettings",
-        //     "apiVersion": "2021-06-01",
-        //     "name": "[concat(variables('SynapseWorkspaceName'), '/sqlpoolfraud/Default')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Synapse/workspaces/sqlPools', variables('SynapseWorkspaceName'), 'sqlpoolfraud')]",
-        //         "[resourceId('Microsoft.Synapse/workspaces', variables('SynapseWorkspaceName'))]"
-        //     ],
-        //     "properties": {
-        //         "retentionDays": 0,
-        //         "auditActionsAndGroups": [],
-        //         "isStorageSecondaryKeyInUse": false,
-        //         "isAzureMonitorTargetEnabled": false,
-        //         "state": "Disabled",
-        //         "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
-        //     }
-        // },
-        //  {
-        //     "type": "Microsoft.Synapse/workspaces/sqlPools/geoBackupPolicies",
-        //     "apiVersion": "2021-06-01",
-        //     "name": "[concat(variables('SynapseWorkspaceName'), '/sqlpoolfraud/Default')]",
-        //     "location": "Brazil South",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Synapse/workspaces/sqlPools', variables('SynapseWorkspaceName'), 'sqlpoolfraud')]",
-        //         "[resourceId('Microsoft.Synapse/workspaces', variables('SynapseWorkspaceName'))]"
-        //     ],
-        //     "properties": {
-        //         "state": "Enabled"
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Synapse/workspaces/sqlPools/securityAlertPolicies",
-        //     "apiVersion": "2021-06-01",
-        //     "name": "[concat(variables('SynapseWorkspaceName'), '/sqlpoolfraud/Default')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Synapse/workspaces/sqlPools', variables('SynapseWorkspaceName'), 'sqlpoolfraud')]",
-        //         "[resourceId('Microsoft.Synapse/workspaces', variables('SynapseWorkspaceName'))]"
-        //     ],
-        //     "properties": {
-        //         "state": "Disabled",
-        //         "disabledAlerts": [
-        //             ""
-        //         ],
-        //         "emailAddresses": [
-        //             ""
-        //         ],
-        //         "emailAccountAdmins": false,
-        //         "retentionDays": 0
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Synapse/workspaces/sqlPools/transparentDataEncryption",
-        //     "apiVersion": "2021-06-01",
-        //     "name": "[concat(variables('SynapseWorkspaceName'), '/sqlpoolfraud/current')]",
-        //     "location": "Brazil South",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Synapse/workspaces/sqlPools', variables('SynapseWorkspaceName'), 'sqlpoolfraud')]",
-        //         "[resourceId('Microsoft.Synapse/workspaces', variables('SynapseWorkspaceName'))]"
-        //     ],
-        //     "properties": {
-        //         "status": "Disabled"
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Synapse/workspaces/sqlPools/vulnerabilityAssessments",
-        //     "apiVersion": "2021-06-01",
-        //     "name": "[concat(variables('SynapseWorkspaceName'), '/sqlpoolfraud/Default')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Synapse/workspaces/sqlPools', variables('SynapseWorkspaceName'), 'sqlpoolfraud')]",
-        //         "[resourceId('Microsoft.Synapse/workspaces', variables('SynapseWorkspaceName'))]"
-        //     ],
-        //     "properties": {
-        //         "recurringScans": {
-        //             "isEnabled": false,
-        //             "emailSubscriptionAdmins": true
-        //         }
-        //     }
-        // }
+        
+    //Synapse TEST Deployment
 
-        //Synapse TEST Deployment
-
-    // ,{
-    //   "type": "Microsoft.Storage/storageAccounts",
-    //   "apiVersion": "2019-06-01",
-    //   "name": "[variables('dlsName')]",
-    //   "location": "[parameters('location')]",
-    //   "sku": {
-    //     "name": "Standard_LRS"
-    //   },
-    //   "kind": "StorageV2",
-    //   "properties": {
-    //     "accessTier": "Hot",
-    //     "supportsHttpsTrafficOnly": true,
-    //     "isHnsEnabled": true
-    //   },
-    //   "resources": [
-    //     {
-    //       "name": "[concat('default/', variables('dlsName'))]",
-    //       "type": "blobServices/containers",
-    //       "apiVersion": "2019-06-01",
-    //       "dependsOn": [
-    //         "[variables('dlsName')]"
-    //       ],
-    //       "properties": {
-    //         "publicAccess": "None"
-    //       }
-    //     }
-    //   ]
-    // },
     ,{
         "type": "Microsoft.Storage/storageAccounts",
         "apiVersion": "2019-04-01",
