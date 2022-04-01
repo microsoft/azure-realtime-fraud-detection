@@ -16,11 +16,6 @@ To run the scripts to feed the Containers with Sample Data you will need [Azure 
 pip install --pre azure-cosmos
 ```
 
-## To Do ##
-- Adicionar a imagem para a substituição das connections String do Cosmos dentro do codigo
-        endpoint = ***
-        key = ***
-
 ## Concepts
 
 You can use our sample data to test the Architecture. Three Cosmos DB containers should be loaded in our Cosmos DB SQL API. Let's see the purpose of each one:
