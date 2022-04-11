@@ -9,6 +9,9 @@
           "description": "Specifies the name of the Azure Machine Learning service workspace."
         }
       },
+      "cosmosDBName": {
+        "type": "string"
+      },
       "workspaceName": {
         "type": "string",
         "metadata": {
@@ -108,7 +111,7 @@
       "defaultDataLakeStorageFilesystemName":"[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
       "defaultDataLakeStorageAccountUrl": "[concat('https://', parameters('storageAccountName'), '.dfs.core.windows.net')]",
       "storageAccountName": "[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
-      "dlsName": "[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
+      "dlsName": "[concat(parameters('storageAccountName'),uniqueString(resourceGroup().id))]",
       "storageAccountType": "Standard_LRS",
       "keyVaultName": "[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
       "eventHubName": "[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
@@ -116,7 +119,7 @@
       "applicationInsightsName": "[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
       "hostingPlanName":"[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
       "storageAccountid": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
-      "cosmosName":"[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
+      "cosmosName":"[concat(parameters('cosmosDBName'),uniqueString(resourceGroup().id))]",
       "cosmosGremlinName":"[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
       "SynapseWorkspaceName":"[concat('sy',uniqueString(resourceGroup().id))]",
       "SynapseManagedResourceGroupName":"[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
