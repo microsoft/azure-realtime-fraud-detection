@@ -1,7 +1,7 @@
 # Deploy the Functions
 With all configured services, we can now deploy the functions. We have three functions: Orchestrator, Benford Law and Fraud Ring.
 
-## Definitions
+## Concepts
 
 - Orchestrator Function: This HTTP trigger function has two responsabilities: First, it needs to respond if the transaction is a potential Fraud or not. To do that, it is necessary to call other APIs. In a first version, only a Supervised ML Model will be requested and will return the prediction (Fraud or Non-Fraud) given a Transaction payload. Other three scores should compose this prediction (Graph DB, Benford Law and Profile Analytics). These scores are under development. The second responsability of this function is to post an event in the Event Hubs with the transaction payload and the returned prediction. This event will trigger a series of other tasks (Create the vertices and edges on graph db, calculate benford law, feed the dashboards, etc.).
 
@@ -61,4 +61,14 @@ With the Azure Functions VS Code extension we can deploy them directly from the 
 
 ![Deploy to Function Apps](./Images/deploy-to-function-apps.png)
 
+Fill the options required with your own services' details.
 
+You need to change the Functions' settings directly in portal. Please use the [config example file](config.example) and replace with the values from your local.settings.json. To do that, go to your Function App > Settings > Configuration. You can you se **Advanced edit** and add your configs. You alse need to add a **Connection String** with *MyEventHubSendAppSettings* key-value.
+
+![Function Settings](./Images/function-settings.png)
+
+Now you can test the service. Go to Functions > Score > Code + Test > Test/Run (use the same payload you used in your local test):
+
+![Function Test](./Images/test-function.png)
+
+You can also check the Cosmos DBs (SQL API and Gremlim API) and also Azure Synapse. All of them should be populated with Transactions values.
