@@ -64,7 +64,7 @@ We need to load some data to our Cosmos DB SQL API account. The link below provi
 [Configure Cosmos DB - SQL API](./AzureCosmosDB/README.md)
 
 ### 5. Deploy the Functions
-[How to Deploy the Functions]()
+[How to Deploy the Functions](./Functions/README.md)
 
 ## Contents
 
@@ -73,9 +73,10 @@ In this repo, you'll deploy an architecture ...
 The data used in this sample is simulated based on the [Kaggle](,,,), sales data from a Chicago area grocery store.
 
 ## To Do
-1. aaa
-2. bbb
-3. ccc
+1. Develop Profile Analytics Function
+2. Calculate scores from Graph db, Benford Law, and Profile Analytics
+3. Integrate scores into Orquestrator function
+4. Develop new supervised ML models
 
 ## Contributing
 

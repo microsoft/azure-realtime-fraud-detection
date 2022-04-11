@@ -1,0 +1,26 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+
+   "AKSEndpoint": "http://<YOUR-AKS-ENDPOINT>",
+   "AKSKey": "<YOUR-AKS-KEY>",
+   "MyEventHubSendAppSetting": "Endpoint=sb://<YOUR-EVENTHUB>.servicebus.windows.net/;SharedAccessKeyName....",
+
+    "HOST_GREMLIN": "wss://<YOUR-COSMOSDB-GREMLIM-API>.gremlin.cosmos.azure.com:443/",
+    "DB_GREMLIN": "<YOUR-GREMLIM-DB>",
+    "CONTAINER_GREMLIN": "<YOUR-GREMLIM-CONTAINER>",
+    "KEY_GREMLIN": "<YOUR-GREMLIM-KEY>",
+    "cosmosdbfraud_customer_DOCUMENTDB": "https://<YOUR-COSMOSDB-SQL-API>.documents.azure.com:443/",
+    "cosmosdbfraud_customer_DOCUMENTDB_Key": "<YOUR-COSMOSDB-SQL-API-KEY>",
+    "DATABASE_CUSTOMER": "<YOUR-COSMOSDB-SQL-DB>",
+    "CONTAINER_CUSTOMER": "<YOUR-COSMOSDB-SQL-CONTAINER>",
+
+    "cosmosdbtesseratofraud_DOCUMENTDB": "AccountEndpoint=https://<YOUR-COSMOSDB-SQL-API>.documents.azure.com:443/;AccountKey=...",
+
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName<YOUR-FUNCTION-STORAGE>;AccountKey=....",
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "HOST_BENFORD": "https://<YOUR-COSMOSDB-SQL-API>.documents.azure.com:443/",
+    "DB_BENFORD": "<YOUR-GREMLIM-DB>",
+    "KEY_BENFORD": "<YOUR-COSMOSDB-SQL-API-KEY>"
+  }
+}

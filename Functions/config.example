@@ -1,0 +1,76 @@
+
+  {
+    "name": "AKSEndpoint",
+    "value": "http://<YOUR-AKS-ENDPOINT>",
+    "slotSetting": false
+  },
+  {
+    "name": "AKSKey",
+    "value": "<YOUR-AKS-KEY>",
+    "slotSetting": false
+  },
+  {
+    "name": "CONTAINER_CUSTOMER",
+    "value": "<YOUR-COSMOSDB-SQL-CONTAINER>",
+    "slotSetting": false
+  },
+  {
+    "name": "CONTAINER_GREMLIN",
+    "value": "<YOUR-GREMLIM-CONTAINER>",
+    "slotSetting": false
+  },
+  {
+    "name": "cosmosdbfraud_customer_DOCUMENTDB",
+    "value": "https://<YOUR-COSMOSDB-SQL-API>.documents.azure.com:443/",
+    "slotSetting": false
+  },
+  {
+    "name": "cosmosdbfraud_customer_DOCUMENTDB_Key",
+    "value": "<YOUR-COSMOSDB-SQL-API-KEY>",
+    "slotSetting": false
+  },
+  {
+    "name": "cosmosdbtesseratofraud_DOCUMENTDB",
+    "value": "AccountEndpoint=https://<YOUR-COSMOSDB-SQL-API>.documents.azure.com:443/;AccountKey=...",
+    "slotSetting": false
+  },
+  {
+    "name": "DATABASE_CUSTOMER",
+    "value":  "<YOUR-COSMOSDB-SQL-DB>",
+    "slotSetting": false
+  },
+  {
+    "name": "DB_BENFORD",
+    "value": "<YOUR-GREMLIM-DB>",
+    "slotSetting": false
+  },
+  {
+    "name": "DB_GREMLIN",
+    "value": "<YOUR-GREMLIM-DB>",
+    "slotSetting": false
+  },
+  {
+    "name": "EventHubTopic",
+    "value": "tesseratosend",
+    "slotSetting": false
+  },
+  {
+    "name": "HOST_BENFORD",
+    "value": "https://<YOUR-COSMOSDB-SQL-API>.documents.azure.com:443/",
+    "slotSetting": false
+  },
+  {
+    "name": "HOST_GREMLIN",
+    "value": "wss://<YOUR-COSMOSDB-GREMLIM-API>.gremlin.cosmos.azure.com:443/",
+    "slotSetting": false
+  },
+  {
+    "name": "KEY_BENFORD",
+    "value": "<YOUR-COSMOSDB-SQL-API-KEY>",
+    "slotSetting": false
+  },
+  {
+    "name": "KEY_GREMLIN",
+    "value": "<YOUR-GREMLIM-KEY>",
+    "slotSetting": false
+  }
