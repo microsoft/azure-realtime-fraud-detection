@@ -117,11 +117,13 @@
       "eventHubName": "[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
       "tenantId": "[subscription().tenantId]",
       "applicationInsightsName": "[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
+      "applicationInsightsNameML": "[concat('appml',uniqueString(resourceGroup().id))]",
       "hostingPlanName":"[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
       "storageAccountid": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
       "cosmosName":"[concat(parameters('cosmosDBName'),uniqueString(resourceGroup().id))]",
       "cosmosGremlinName":"[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
       "SynapseWorkspaceName":"[concat('sy',uniqueString(resourceGroup().id))]",
+      "containerRegistryName":"[concat('registry',uniqueString(resourceGroup().id))]",
       "SynapseManagedResourceGroupName":"[concat(parameters('deploymentPrefixName'),uniqueString(resourceGroup().id))]",
       "dataLakeStorageName": "[if(empty(parameters('storageAccountName')), replace(tolower(parameters('workspaceName')),'-',''), tolower(parameters('storageAccountName')))]",
       "sqlPoolName":"[concat('syPool',uniqueString(resourceGroup().id))]"
@@ -1024,10 +1026,30 @@
           }
         }
       ]
+    },
+    {
+      "name": "linkedTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/alfeuduran/FraudArmTemplate/main/arm_template/mltemplate.json"
+        },
+        "parameters": {
+          "workspaceName": {
+            "value": "[variables('storageAccountName')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "resourceGroupName": {
+            "value": "fraud-alfeu"
+          }
+        }
+      }
     }
 
-        
-        
       ]
 
 }
