@@ -64,6 +64,7 @@ We need to load some data to our Cosmos DB SQL API account. The link below provi
 [Configure Cosmos DB - SQL API](./AzureCosmosDB/README.md)
 
 ### 5. Deploy the Functions
+Finally, we have to deploy the Functions. Follow the link below to proceed with this task.
 [How to Deploy the Functions](./Functions/README.md)
 
 ## Contents
