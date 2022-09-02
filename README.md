@@ -41,8 +41,8 @@ While it's not required, a basic understanding of some services used will be hel
 
 Start by deploying the resources to Azure. The button below will deploy All the services and its related resources:
 
-<a href="https://raw.githubusercontent.com/microsoft/azure-realtime-fraud-detection/main/arm_template/template.json(https://raw.githubusercontent.com/microsoft/azure-realtime-fraud-detection/main/arm_template/template.json?)" target="_blank">
-    <img src="http://azuredeploy.net/deploybutton.png"/>
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com/microsoft/azure-realtime-fraud-detection/main/arm_template/template.json" target="_blank">
+    <img src="https://aka.ms/deploytoazurebutton"/>
 </a>
 
 ### 2. Configure Azure ML Environment
