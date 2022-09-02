@@ -1,4 +1,4 @@
-# Real-Time Fraud Detection
+# Real-Time Fraud Detection on Azure
 
 <!-- 
 Guidelines on README format: https://review.docs.microsoft.com/help/onboard/admin/samples/concepts/readme-template?branch=master
@@ -41,7 +41,7 @@ While it's not required, a basic understanding of some services used will be hel
 
 Start by deploying the resources to Azure. The button below will deploy All the services and its related resources:
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fsolution-accelerator-many-models%2Fmaster%2Fazuredeploy.json(https://raw.githubusercontent.com/microsoft/azure-realtime-fraud-detection/main/arm_template/template.json?)" target="_blank">
+<a href="https://raw.githubusercontent.com/microsoft/azure-realtime-fraud-detection/main/arm_template/template.json(https://raw.githubusercontent.com/microsoft/azure-realtime-fraud-detection/main/arm_template/template.json?)" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
