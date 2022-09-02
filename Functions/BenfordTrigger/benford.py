@@ -12,12 +12,10 @@ class Benford():
     def _connect_cosmosdb_(self):
         self.endpoint = os.getenv("HOST_BENFORD")
         self.key = os.getenv("KEY_BENFORD")
-        print("ESTAS SÃO AS CHAVES:", self.endpoint, self.key)
         self.client = CosmosClient(self.endpoint, self.key)
 
         ##### Adicionar dentro do arquivo de config
         self.database_name = os.getenv("DB_BENFORD")
-        print("ESTE É O BD:", self.database_name)
         self.database = self.client.create_database_if_not_exists(id=self.database_name)
     
     def _return_container_(self, container_name):
