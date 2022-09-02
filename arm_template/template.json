@@ -523,7 +523,7 @@
                     },
                     "partitionKey": {
                         "paths": [
-                            "/CategoryId"
+                            "/id"
                         ],
                         "kind": "Hash"
                     },
@@ -643,7 +643,7 @@
                     },
                     "partitionKey": {
                         "paths": [
-                            "/OrderId"
+                            "/id"
                         ],
                         "kind": "Hash"
                     },
@@ -694,23 +694,6 @@
                     "conflictResolutionPolicy": {
                         "mode": "LastWriterWins",
                         "conflictResolutionPath": "/_ts"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/throughputSettings",
-            "apiVersion": "2021-10-15",
-            "name": "[concat(variables('cosmosName'), '/Fraud/default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('cosmosName'), 'Fraud')]",
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosName'))]"
-            ],
-            "properties": {
-                "resource": {
-                    "throughput": 400,
-                    "autoscaleSettings": {
-                        "maxThroughput": 4000
                     }
                 }
             }
@@ -880,20 +863,6 @@
                     }
                 }
             }
-        },
-        {
-            "type": "Microsoft.DocumentDB/databaseAccounts/gremlinDatabases/throughputSettings",
-            "apiVersion": "2021-10-15",
-            "name": "[concat(variables('cosmosGremlinName'), '/frauddetectiondb/default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts/gremlinDatabases', variables('cosmosGremlinName'), 'frauddetectiondb')]",
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosGremlinName'))]"
-            ],
-            "properties": {
-                "resource": {
-                    "throughput": 400
-                }
-            }
         }
 
         
@@ -1044,7 +1013,7 @@
             "value": "[parameters('location')]"
           },
           "resourceGroupName": {
-            "value": "fraud-alfeu"
+            "value": "[resourceGroup().name]"
           }
         }
       }
