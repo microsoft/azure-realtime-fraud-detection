@@ -1,4 +1,4 @@
-# Real-Time Fraud Detection -  Solution Accelerator
+# Real-Time Fraud Detection
 
 <!-- 
 Guidelines on README format: https://review.docs.microsoft.com/help/onboard/admin/samples/concepts/readme-template?branch=master
@@ -24,7 +24,7 @@ Please check the prerequisites and step-by-step instructions for configuring the
 
 ## Prerequisites
 
-To use this solution accelerator, you need access to an [Azure subscription](https://azure.microsoft.com/free/). Below we will show the steps to deploy and configure the services.
+To use this repository, you need access to an [Azure subscription](https://azure.microsoft.com/free/). Below we will show the steps to deploy and configure the services.
 
 While it's not required, a basic understanding of some services used will be helpful for understanding the solution. The following resources can help introduce you to them:
 
@@ -41,7 +41,7 @@ While it's not required, a basic understanding of some services used will be hel
 
 Start by deploying the resources to Azure. The button below will deploy All the services and its related resources:
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fsolution-accelerator-many-models%2Fmaster%2Fazuredeploy.json" target="_blank">
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fsolution-accelerator-many-models%2Fmaster%2Fazuredeploy.json(https://raw.githubusercontent.com/microsoft/azure-realtime-fraud-detection/main/arm_template/template.json?)" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
