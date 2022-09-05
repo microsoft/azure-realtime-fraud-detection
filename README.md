@@ -67,12 +67,6 @@ We need to load some data to our Cosmos DB SQL API account. The link below provi
 Finally, we have to deploy the Functions. Follow the link below to proceed with this task.
 [How to Deploy the Functions](./Functions/README.md)
 
-## Contents
-
-In this repo, you'll deploy an architecture ...
-
-The data used in this sample is simulated based on the [Kaggle](,,,), sales data from a Chicago area grocery store.
-
 ## To Do
 1. Develop Profile Analytics Function
 2. Calculate scores from Graph db, Benford Law, and Profile Analytics
