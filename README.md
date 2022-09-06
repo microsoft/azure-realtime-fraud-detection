@@ -41,7 +41,7 @@ While it's not required, a basic understanding of some services used will be hel
 
 Start by deploying the resources to Azure. The button below will deploy All the services and its related resources:
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com/microsoft/azure-realtime-fraud-detection/main/arm_template/template.json" target="_blank">
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure-realtime-fraud-detection%2Fmain%2Farm_template%2Ftemplate.json" target="_blank">
     <img src="https://aka.ms/deploytoazurebutton"/>
 </a>
 
