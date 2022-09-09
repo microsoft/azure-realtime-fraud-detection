@@ -1,0 +1,13 @@
+$schema: https://azuremlschemas.azureedge.net/latest/managedOnlineDeployment.schema.json
+name: fraud-ga
+endpoint_name: <ENDPOINT-NAME>
+model:
+  path: ../output-model/
+code_configuration:
+  code: ../output-model/
+  scoring_script: score.py
+environment: 
+  conda_file: ../output-model/conda.yaml
+  image: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:20220902.v1
+instance_type: Standard_DS2_v2
+instance_count: 1
