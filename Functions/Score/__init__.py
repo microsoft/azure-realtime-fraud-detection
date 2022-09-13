@@ -20,6 +20,7 @@ def main(req: func.HttpRequest, msg: func.Out[str]) -> func.HttpResponse:
 
     data = json.loads(req.get_body())
     data_prediction = dict((k, data[k]) for k in config.prediction_columns if k in data)
+    data_prediction = {"data": [data_prediction]}
 
     response = requests.request("POST", url, headers=headers, data= json.dumps(data_prediction))
     data.update({"prediction" : response.json()['prediction'][0]})
