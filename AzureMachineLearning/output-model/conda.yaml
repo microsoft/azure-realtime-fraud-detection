@@ -5,7 +5,10 @@ dependencies:
   - python=3.8
   - pip
   - mlflow
+  - numpy
   - pip:
     - azureml-defaults
     - joblib
     - sklearn
+    - inference-schema
+    - inference-schema[numpy-support]

@@ -1,0 +1,230 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "ML service",
+        "description": "API specification for the Azure Machine Learning service ML service",
+        "version": "1.0"
+    },
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "For example: Bearer abc123"
+        }
+    },
+    "paths": {
+        "/": {
+            "get": {
+                "operationId": "ServiceHealthCheck",
+                "description": "Simple health check endpoint to ensure the service is up at any given point.",
+                "responses": {
+                    "200": {
+                        "description": "If service is up and running, this response will be returned with the content 'Healthy'",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "examples": {
+                            "application/json": "Healthy"
+                        }
+                    },
+                    "default": {
+                        "description": "The service failed to execute due to an error.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/score": {
+            "post": {
+                "operationId": "RunMLService",
+                "description": "Run web service's model and get the prediction output",
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "serviceInputPayload",
+                        "in": "body",
+                        "description": "The input payload for executing the real-time machine learning service.",
+                        "schema": {
+                            "$ref": "#/definitions/ServiceInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The service processed the input correctly and provided a result prediction, if applicable.",
+                        "schema": {
+                            "$ref": "#/definitions/ServiceOutput"
+                        }
+                    },
+                    "default": {
+                        "description": "The service failed to execute due to an error.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/swagger.json": {
+            "get": {
+                "operationId": "GetSwaggerSpec",
+                "description": "Get the Swagger specification.",
+                "parameters": [
+                    {
+                        "name": "version",
+                        "in": "query",
+                        "required": false,
+                        "type": "integer",
+                        "enum": [
+                            2,
+                            3
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The Swagger specification.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "default": {
+                        "description": "The service failed to execute due to an error.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "ServiceInput": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "type",
+                            "amount",
+                            "oldbalanceOrg",
+                            "newbalanceOrig",
+                            "oldbalanceDest",
+                            "newbalanceDest",
+                            "hour",
+                            "dayOfMonth",
+                            "isMerchantDest",
+                            "errorBalanceOrig",
+                            "errorBalanceDest"
+                        ],
+                        "properties": {
+                            "type": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "amount": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "oldbalanceOrg": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "newbalanceOrig": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "oldbalanceDest": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "newbalanceDest": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "hour": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "dayOfMonth": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "isMerchantDest": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "errorBalanceOrig": {
+                                "type": "number",
+                                "format": "double"
+                            },
+                            "errorBalanceDest": {
+                                "type": "number",
+                                "format": "double"
+                            }
+                        }
+                    },
+                    "format": "pandas.DataFrame:records"
+                }
+            },
+            "example": {
+                "data": [
+                    {
+                        "type": 1.0,
+                        "amount": 100.0,
+                        "oldbalanceOrg": 1000.0,
+                        "newbalanceOrig": 900.0,
+                        "oldbalanceDest": 0.0,
+                        "newbalanceDest": 0.0,
+                        "hour": 1.0,
+                        "dayOfMonth": 1.0,
+                        "isMerchantDest": 1.0,
+                        "errorBalanceOrig": 0.0,
+                        "errorBalanceDest": 900.0
+                    }
+                ]
+            }
+        },
+        "ServiceOutput": {
+            "type": "array",
+            "items": {
+                "type": "integer",
+                "format": "int64"
+            },
+            "example": [
+                0
+            ],
+            "format": "numpy.ndarray"
+        },
+        "ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "status_code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
